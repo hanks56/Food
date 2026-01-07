@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food - Premium Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .modal-enter { opacity: 0; transform: scale(0.9); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 0.3s ease-out, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .float-anim { animation: float 4s ease-in-out infinite; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 500: '#f97316', 600: '#ea580c', primary: '#FF441F' }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(255, 68, 31, 0.35)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#F8F9FA] text-slate-800 antialiased selection:bg-orange-200 selection:text-orange-900">
+
+    <nav class="fixed w-full z-50 top-0 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-white/40 shadow-sm">
+        <div class="container mx-auto px-6 py-3 flex items-center justify-between">
+            
+            <div class="flex items-center gap-8">
+                <a href="{% url 'home' %}" class="group flex items-center gap-1">
+                    <span class="text-3xl font-black italic tracking-tighter bg-gradient-to-r from-[#FF441F] to-[#FF8C68] bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
+                        Food
+                    </span>
+                    <span class="w-2 h-2 rounded-full bg-[#FF441F] mt-3"></span>
+                </a>
+
+                <div class="hidden md:flex items-center gap-3 px-4 py-2 rounded-full bg-slate-100/50 hover:bg-white border border-transparent hover:border-gray-200 transition-all cursor-pointer group shadow-sm">
+                    <div class="bg-white p-1.5 rounded-full shadow-sm text-[#FF441F]">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="flex flex-col leading-none">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ubicación</span>
+                        <span class="text-xs font-bold text-gray-700 group-hover:text-[#FF441F] transition-colors">Barranquilla, Atlántico</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs text-gray-400 ml-2"></i>
+                </div>
+            </div>
+
+            <div class="hidden lg:flex flex-1 max-w-lg mx-auto relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400 group-focus-within:text-[#FF441F] transition-colors"></i>
+                </div>
+                <input type="text" class="block w-full pl-11 pr-4 py-3 bg-gray-100 border-none rounded-full text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF441F]/20 focus:bg-white transition-all shadow-inner" placeholder="Buscar en Food...">
+                <div class="absolute inset-y-1 right-1">
+                    <button class="bg-white text-gray-600 hover:text-[#FF441F] px-4 h-full rounded-full text-xs font-bold shadow-sm border border-gray-100 transition">Buscar</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                
+                {% if user.is_authenticated %}
+                    <div class="relative group z-50">
+                        <button class="flex items-center gap-3 bg-white border border-gray-200 hover:border-[#FF441F] pl-1 pr-4 py-1 rounded-full transition-all shadow-sm hover:shadow-md">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#FF441F] to-orange-400 flex items-center justify-center text-white text-xs font-bold shadow-inner">
+                                {{ user.first_name|first|upper }}
+                            </div>
+                            <div class="flex flex-col items-start leading-none">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Hola</span>
+                                <span class="text-sm font-bold text-slate-700">{{ user.first_name }}</span>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-400 ml-2 group-hover:text-[#FF441F] transition"></i>
+                        </button>
+                        
+                        <div class="absolute right-0 mt-3 w-60 bg-white rounded-2xl shadow-xl shadow-orange-500/10 border border-gray-100 hidden group-hover:block p-2 animate-enter transform origin-top-right">
+                            <div class="px-4 py-3 border-b border-gray-50 mb-2">
+                                <p class="text-sm font-bold text-slate-800 truncate">{{ user.email }}</p>
+                                <p class="text-[10px] text-green-500 font-semibold uppercase tracking-wide">● En línea</p>
+                            </div>
+
+                            <a href="{% url 'dashboard' %}?section=profile" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-orange-50 hover:text-[#FF441F] rounded-xl transition font-medium">
+                                <i class="fas fa-user-circle w-5"></i> Mi Perfil
+                            </a>
+                            <a href="{% url 'dashboard' %}?section=orders" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-orange-50 hover:text-[#FF441F] rounded-xl transition font-medium">
+                                <i class="fas fa-receipt w-5"></i> Mis Pedidos
+                            </a>
+                            
+                            {% if user.is_business_owner %}
+                                <div class="my-2 border-t border-gray-50"></div>
+                                <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#FF441F] bg-orange-50/50 hover:bg-orange-100 rounded-xl transition font-bold">
+                                    <i class="fas fa-store w-5"></i> Mi Negocio
+                                </a>
+                            {% endif %}
+                            
+                            <div class="my-2 border-t border-gray-50"></div>
+                            <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 rounded-xl transition font-medium">
+                                <i class="fas fa-sign-out-alt w-5"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <button onclick="toggleModal('loginModal')" class="hidden sm:block text-slate-600 font-bold text-sm hover:text-[#FF441F] transition">Ingresar</button>
+                    <button onclick="toggleModal('registerModal')" class="bg-[#00A373] hover:bg-[#008F64] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300">Registrarse</button>
+                {% endif %}
+
+                <div class="relative cursor-pointer group">
+                    <div class="p-2 rounded-full hover:bg-orange-50 transition">
+                         <i class="fas fa-shopping-bag text-xl text-slate-600 group-hover:text-[#FF441F] transition-colors"></i>
+                    </div>
+                    <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[9px] text-white font-bold">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative pt-32 pb-32 overflow-hidden">
+        <div class="absolute inset-0 z-0 bg-gradient-to-br from-[#FF441F] via-[#FF6B4A] to-[#FF9068]"></div>
+        <div class="absolute top-20 right-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl mix-blend-overlay float-anim"></div>
+        <div class="absolute bottom-0 left-20 w-72 h-72 bg-yellow-300 opacity-20 rounded-full blur-3xl mix-blend-overlay" style="animation-delay: 1s;"></div>
+        <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <span class="inline-block py-1 px-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-bold tracking-wider mb-6 shadow-lg">
+                🚀 Pide hoy, recibe en minutos
+            </span>
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-8 tracking-tight drop-shadow-sm leading-tight">
+                Todo lo que amas, <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 italic">
+                    en la puerta de tu casa.
+                </span>
+            </h1>
+
+            <div class="max-w-3xl mx-auto relative group transform hover:-translate-y-1 transition-transform duration-500">
+                <div class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div class="relative bg-white rounded-2xl p-2 shadow-2xl flex flex-col md:flex-row items-center gap-2">
+                    <div class="flex-1 flex items-center w-full px-4">
+                        <i class="fas fa-map-marker-alt text-[#FF441F] text-xl animate-bounce"></i>
+                        <input type="text" placeholder="¿Dónde quieres recibir tu pedido?" class="w-full py-4 px-4 text-lg text-slate-700 placeholder-slate-400 bg-transparent border-none focus:ring-0 outline-none font-medium">
+                    </div>
+                    <button class="w-full md:w-auto bg-gradient-to-r from-[#FF441F] to-[#FF6B4A] hover:from-[#e03a1b] hover:to-[#FF441F] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-500/30 transition-all">Buscar Comida</button>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-center gap-6 text-white/90 text-sm font-medium">
+                <button class="hover:text-white hover:underline flex items-center gap-2 transition">
+                    <i class="fas fa-crosshairs"></i> Usar ubicación actual
+                </button>
+            </div>
+        </div>
+        <div class="absolute bottom-0 w-full overflow-hidden leading-[0] z-20">
+            <svg class="relative block w-[calc(100%+1.3px)] h-[80px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" class="fill-[#F8F9FA]"></path>
+            </svg>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 -mt-10 relative z-30 pb-24">
+        
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Restaurantes Top</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for restaurant in restaurants %}
+                <div class="bg-white rounded-2xl shadow-card hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100">
+                    <div class="relative h-48 overflow-hidden">
+                        {% if restaurant.cover_image %}
+                            <img src="{{ restaurant.cover_image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        {% else %}
+                            <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400"><i class="fas fa-image text-2xl"></i></div>
+                        {% endif %}
+                        <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
+                            <i class="fas fa-star text-yellow-400"></i> {{ restaurant.rating }}
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-extrabold text-lg text-slate-800 mb-1">{{ restaurant.name }}</h3>
+                        <p class="text-xs text-slate-500 font-medium mb-3">{{ restaurant.category.name }} • {{ restaurant.delivery_time }}</p>
+                        <div class="flex items-center gap-2 text-[#00A373] text-xs font-bold bg-green-50 w-fit px-2 py-1 rounded">
+                            <i class="fas fa-motorcycle"></i> Envío Gratis
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-4 text-center py-10 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-300">
+                    <p>No hay restaurantes disponibles.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Mercado Esencial</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for product in market_products %}
+                <div class="bg-white rounded-2xl shadow-card hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100">
+                    <div class="relative h-48 overflow-hidden bg-gray-50 flex items-center justify-center p-4">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="h-full object-contain group-hover:scale-110 transition duration-500">
+                        {% else %}
+                            <div class="text-gray-300"><i class="fas fa-shopping-basket text-4xl"></i></div>
+                        {% endif %}
+                    </div>
+                    <div class="p-5">
+                        <p class="text-xs text-slate-400 font-bold uppercase mb-1">{{ product.aisle.name }}</p>
+                        <h3 class="font-bold text-md text-slate-800 mb-2 leading-tight">{{ product.name }}</h3>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-lg font-extrabold text-[#FF441F]">${{ product.price }}</span>
+                            <button class="bg-gray-100 hover:bg-[#FF441F] hover:text-white w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-4 text-center py-10 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-300">
+                    <p>No hay productos de mercado disponibles.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-slate-900 rounded-[2.5rem] p-10 md:p-16 text-center relative overflow-hidden shadow-2xl mb-12">
+            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+            <div class="absolute -top-24 -left-24 w-64 h-64 bg-[#FF441F] rounded-full blur-[80px] opacity-40"></div>
+            <div class="relative z-10 max-w-4xl mx-auto">
+                <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">Crece con <span class="text-[#FF441F] italic">Food</span></h2>
+                <p class="text-slate-400 mb-12 text-lg">La tecnología que conecta a miles de usuarios con sus antojos.</p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-3xl hover:bg-white/20 transition cursor-pointer group">
+                        <div class="w-12 h-12 bg-[#FF441F] rounded-xl flex items-center justify-center text-white text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-store"></i></div>
+                        <h4 class="text-white font-bold text-lg mb-2">Para Negocios</h4>
+                        <p class="text-slate-400 text-sm">Digitaliza tu restaurante o tienda.</p>
+                        <button onclick="toggleModal('registerModal')" class="mt-4 text-[#FF441F] text-xs font-bold uppercase hover:underline">Registrar Negocio</button>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-3xl hover:bg-white/20 transition cursor-pointer group">
+                        <div class="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-motorcycle"></i></div>
+                        <h4 class="text-white font-bold text-lg mb-2">Para Repartidores</h4>
+                        <p class="text-slate-400 text-sm">Sé tu propio jefe, gana dinero.</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-3xl hover:bg-white/20 transition cursor-pointer group">
+                        <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-briefcase"></i></div>
+                        <h4 class="text-white font-bold text-lg mb-2">Empleo</h4>
+                        <p class="text-slate-400 text-sm">Únete al equipo corporativo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+                <div class="text-center md:text-left">
+                    <a href="#" class="text-3xl font-black italic text-slate-300 hover:text-slate-400 transition">Food</a>
+                    <p class="text-sm text-gray-400 mt-2">Tecnología para tu vida diaria.</p>
+                </div>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-slate-500 hover:bg-[#FF441F] hover:text-white transition-all duration-300 shadow-sm"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-slate-500 hover:bg-[#FF441F] hover:text-white transition-all duration-300 shadow-sm"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="text-center border-t border-gray-100 pt-8">
+                <p class="text-xs text-gray-400 font-medium">© 2026 Food Inc. Hecho con ❤️.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <div id="loginModal" class="hidden fixed inset-0 z-[60] overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="toggleModal('loginModal')"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#FF441F] to-orange-400"></div>
+                <button onclick="toggleModal('loginModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+                <div class="px-8 py-10">
+                    <div class="text-center mb-8">
+                        <div class="inline-block p-3 rounded-full bg-orange-50 text-[#FF441F] text-2xl mb-4"><i class="fas fa-user-circle"></i></div>
+                        <h3 class="text-2xl font-bold text-slate-800">Bienvenido a Food</h3>
+                        <p class="text-sm text-slate-500 mt-1">Ingresa para pedir tu comida</p>
+                    </div>
+                    <form action="{% url 'login' %}" method="POST" class="space-y-5">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Email</label>
+                            <input type="email" name="email" placeholder="hola@ejemplo.com" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-[#FF441F]/50 focus:border-[#FF441F] transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Contraseña</label>
+                            <input type="password" name="password" placeholder="••••••••" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-2 focus:ring-[#FF441F]/50 focus:border-[#FF441F] transition-all">
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-[#FF441F] to-[#FF6B4A] hover:to-[#FF441F] text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-500/30 transform active:scale-95 transition-all duration-200">Iniciar Sesión</button>
+                    </form>
+                    <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <p class="text-sm text-slate-500">¿Aún no tienes cuenta? <a href="#" onclick="toggleModal('loginModal'); toggleModal('registerModal')" class="text-[#FF441F] font-bold hover:underline">Regístrate gratis</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerModal" class="hidden fixed inset-0 z-[60] overflow-y-auto">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="toggleModal('registerModal')"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#00A373] to-emerald-400"></div>
+                <button onclick="toggleModal('registerModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+                <div class="px-8 py-10">
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-bold text-slate-800">Crea tu cuenta</h3>
+                        <p class="text-sm text-slate-500">Y recibe tu primer domicilio <span class="text-[#00A373] font-bold">Gratis</span></p>
+                    </div>
+                    <form action="{% url 'register' %}" method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" name="first_name" placeholder="Nombre" required class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-[#00A373] transition-colors">
+                            <input type="text" name="last_name" placeholder="Apellido" required class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-[#00A373] transition-colors">
+                        </div>
+                        <input type="email" name="email" placeholder="Correo electrónico" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-[#00A373] transition-colors">
+                        <input type="password" name="password" placeholder="Crear contraseña" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-[#00A373] transition-colors">
+                        <div class="flex items-start gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <div class="flex h-5 items-center">
+                                <input id="is_business" name="is_business" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#00A373] focus:ring-[#00A373]">
+                            </div>
+                            <label for="is_business" class="text-xs text-slate-600 font-medium cursor-pointer">Quiero registrar mi <span class="text-[#00A373] font-bold">Restaurante o Tienda</span>.</label>
+                        </div>
+                        <div class="flex items-start gap-3 mt-2">
+                            <div class="flex h-5 items-center">
+                                <input id="terms" type="checkbox" required class="h-4 w-4 rounded border-gray-300 text-[#00A373] focus:ring-[#00A373]">
+                            </div>
+                            <label for="terms" class="text-xs text-slate-500">Acepto los <a href="#" class="font-bold text-[#00A373] hover:underline">Términos</a> y Política.</label>
+                        </div>
+                        <button type="submit" class="w-full bg-[#00A373] hover:bg-[#008f65] text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-500/20 transform active:scale-95 transition-all duration-200 mt-2">Crear Cuenta</button>
+                    </form>
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-slate-500">¿Ya tienes cuenta? <a href="#" onclick="toggleModal('registerModal'); toggleModal('loginModal')" class="text-[#FF441F] font-bold hover:underline">Inicia Sesión</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleModal(modalID) {
+            const modal = document.getElementById(modalID);
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; 
+                const content = modal.querySelector('.relative');
+                content.classList.add('modal-enter');
+                setTimeout(() => {
+                    content.classList.remove('modal-enter');
+                    content.classList.add('modal-enter-active');
+                }, 10);
+            } else {
+                modal.classList.add('hidden');
+                document.body.style.overflow = ''; 
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+from django.apps import AppConfig
+
+class PetsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'applications.category.pets'
+    verbose_name = 'Pets Manager'

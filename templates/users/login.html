@@ -1,0 +1,47 @@
+{% extends 'incluides/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-orange-600">Bienvenido</h2>
+            <p class="text-gray-500 mt-2">Ingresa tus credenciales</p>
+        </div>
+        
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                    <p class="font-bold">Error de acceso</p>
+                    <p>Usuario o contraseña incorrectos.</p>
+                </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Usuario</label>
+                {% render_field form.username class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-orange-500 focus:bg-white focus:outline-none transition duration-200" placeholder="Ej: usuario123" %}
+            </div>
+
+            <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Contraseña</label>
+                {% render_field form.password class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-orange-500 focus:bg-white focus:outline-none transition duration-200" placeholder="******" %}
+            </div>
+
+            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-0.5">
+                Ingresar
+            </button>
+        </form>
+
+        <div class="mt-8 text-center border-t pt-6">
+            <p class="text-sm text-gray-600">
+                ¿Nuevo en la app? 
+                <a href="{% url 'users_app:user-register' %}" class="text-orange-600 hover:text-orange-800 font-bold ml-1">Crear cuenta</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
