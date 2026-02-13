@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Cuenta | APIfood{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rappi: "#FF5722",
+                        rappiSoft: "#FF8A65",
+                        carbon: "#1A1A1B",
+                        ceniza: "#5E5E5E",
+                        humo: "#F2F2F2",
+                    },
+                    fontFamily: { sans: ["Inter", "sans-serif"] },
+                    boxShadow: { soft: "0 4px 20px rgba(0,0,0,0.08)" },
+                },
+            },
+        };
+    </script>
+    <style>body { font-family: "Inter", sans-serif; }</style>
+</head>
+<body class="bg-humo text-carbon min-h-screen flex flex-col">
+    {# Navbar minimalista para flujo de autenticación #}
+    <header class="bg-white shadow-sm">
+        <nav class="flex justify-between items-center px-6 py-4 max-w-6xl mx-auto">
+            <a href="{% url 'landing' %}" 
+               class="text-xl font-extrabold text-rappi tracking-tight hover:text-rappiSoft transition">
+                API<span class="text-carbon">food</span>
+            </a>
+            <a href="{% url 'landing' %}" 
+               class="text-sm font-medium text-ceniza hover:text-rappi transition flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Volver al inicio
+            </a>
+        </nav>
+    </header>
+
+    {# Tabs para cambiar entre Login y Registro - UX: ver en qué página estás #}
+    <div class="flex justify-center pt-8 pb-2">
+        <div class="inline-flex rounded-full bg-white p-1 shadow-soft border border-gray-100">
+            <a href="{% url 'users_app:user-login' %}" 
+               class="px-6 py-2 rounded-full text-sm font-bold transition-all {% block tab_login_class %}text-ceniza hover:text-carbon hover:bg-humo{% endblock %}">
+                Iniciar sesión
+            </a>
+            <a href="{% url 'users_app:user-register' %}" 
+               class="px-6 py-2 rounded-full text-sm font-bold transition-all {% block tab_register_class %}text-ceniza hover:text-carbon hover:bg-humo{% endblock %}">
+                Crear cuenta
+            </a>
+        </div>
+    </div>
+
+    <main class="flex-1 flex items-center justify-center px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

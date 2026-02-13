@@ -1,6 +1,6 @@
-from home.views import index_view
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', index_view, name='home'),
+    path('', views.landing, name='landing'),
 ]
