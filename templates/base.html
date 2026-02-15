@@ -8,7 +8,6 @@
     <title>APIfood | Tu comida favorita</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="static/main.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -48,7 +47,7 @@
         
 
         <div class="space-x-6 hidden md:flex font-medium text-ceniza">
-            <a href="#" class="hover:text-rappi transition">Menú</a>
+            <a href="{% url 'store_app:catalog' %}" class="hover:text-rappi transition">Menú</a>
             <a href="#" class="hover:text-rappi transition">Promociones</a>
             <a href="#" class="hover:text-rappi transition">Nosotros</a>
         </div>
@@ -77,6 +76,7 @@
     <main>{% block content %} {% endblock %}</main>
 
     <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 
 </html>

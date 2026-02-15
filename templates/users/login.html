@@ -11,8 +11,16 @@
         <p class="text-ceniza text-sm">Ingresa para pedir algo rico :D</p>
     </div>
 
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-3 rounded-xl bg-green-50 text-green-700 text-sm">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
     <form method="post" class="space-y-6" action="{% url 'users_app:user-login' %}">
         {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{{ form.non_field_errors }}</div>
+        {% endif %}
         <div class="[&_p]:mb-4 [&_label]:block [&_label]:text-xs [&_label]:font-bold [&_label]:uppercase [&_label]:tracking-wider [&_label]:text-carbon [&_label]:mb-2 [&_label]:ml-1 [&_input]:w-full [&_input]:p-4 [&_input]:bg-humo [&_input]:border [&_input]:border-gray-100 [&_input]:rounded-xl [&_input]:transition-all [&_input:focus]:outline-none [&_input:focus]:border-rappi [&_input:focus]:bg-white [&_input:focus]:ring-2 [&_input:focus]:ring-rappi/20">
             {{ form.as_p }}
         </div>
