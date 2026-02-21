@@ -22,6 +22,6 @@ urlpatterns = [
     path('', include('applications.home.urls')),
     path('usuarios/', include('applications.users.urls')),
     path('tienda/', include('applications.store.urls')),
-    # path('carrito/', include('applications.cart.urls')),  # cuando implementes cart
+    path('carrito/', include('applications.cart.urls')), 
     # path('pedidos/', include('applications.orders.urls')), # cuando implementes orders
 ]

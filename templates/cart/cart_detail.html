@@ -1,0 +1,503 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Carrito | APIfood{% endblock %}
+
+{% block content %}
+
+{# ── Notificación toast (feedback de acciones AJAX) ────────────────────── #}
+<div id="toast"
+     class="fixed top-6 right-6 z-[999] flex items-center gap-3 px-5 py-3.5
+            bg-carbon text-white text-sm font-medium rounded-2xl shadow-2xl
+            translate-x-[120%] transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]"
+     role="alert" aria-live="polite">
+    <span id="toast-icon" class="text-lg">✓</span>
+    <span id="toast-msg">Hecho</span>
+</div>
+
+<div class="min-h-[calc(100vh-76px)] bg-humo">
+
+    {# ── Encabezado de página ──────────────────────────────────────────────── #}
+    <div class="bg-white border-b border-gray-100 px-6 md:px-12 py-6">
+        <nav class="text-sm text-ceniza mb-1">
+            <a href="{% url 'landing' %}" class="hover:text-rappi transition">Inicio</a>
+            <span class="mx-2 text-gray-300">›</span>
+            <a href="{% url 'store_app:catalog' %}" class="hover:text-rappi transition">Catálogo</a>
+            <span class="mx-2 text-gray-300">›</span>
+            <span class="text-carbon font-medium">Mi carrito</span>
+        </nav>
+        <div class="flex items-center justify-between mt-2">
+            <h1 class="text-2xl font-extrabold text-carbon">
+                🛒 Mi carrito
+                {# Badge con cantidad total de ítems #}
+                {% if cart.total_items %}
+                <span class="ml-2 inline-flex items-center justify-center
+                             w-7 h-7 rounded-full bg-rappi text-white text-xs font-bold">
+                    {{ cart.total_items }}
+                </span>
+                {% endif %}
+            </h1>
+            {% if items %}
+            {# Botón vaciar: solo visible si hay ítems en el carrito #}
+            <button id="btn-clear-cart"
+                    class="text-sm text-ceniza hover:text-red-500 transition
+                           flex items-center gap-1.5 border border-gray-200
+                           hover:border-red-300 px-3 py-1.5 rounded-xl">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Vaciar carrito
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Layout principal: items (izq) + resumen (der) ─────────────────────── #}
+    <div class="max-w-6xl mx-auto px-4 md:px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {# ════════════════════════════════════════════════════════
+           COLUMNA IZQUIERDA: Lista de ítems del carrito
+        ════════════════════════════════════════════════════════ #}
+        <div class="lg:col-span-2 space-y-4" id="cart-items-container">
+
+            {% if items %}
+
+                {% for item in items %}
+                {#
+                   Cada tarjeta de ítem tiene:
+                   - data-item-id: para identificarlo en las llamadas AJAX
+                   - data-price: precio unitario, para recalcular subtotal en JS
+                #}
+                <div class="cart-item bg-white rounded-2xl p-4 border border-gray-100
+                            shadow-sm hover:shadow-md transition-shadow duration-200
+                            flex gap-4 items-start"
+                     id="item-{{ item.id }}"
+                     data-item-id="{{ item.id }}"
+                     data-price="{{ item.price }}">
+
+                    {# Imagen del producto #}
+                    <div class="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-humo">
+                        {% if item.product.image_url %}
+                            <img src="{{ item.product.image_url }}"
+                                 alt="Foto de {{ item.product.name }}"
+                                 class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-3xl">
+                                🍽️
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {# Info y controles del ítem #}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <h3 class="font-bold text-carbon text-sm md:text-base leading-tight">
+                                    {{ item.product.name }}
+                                </h3>
+                                {# Categoría del producto como chip #}
+                                <span class="text-xs text-ceniza bg-humo px-2 py-0.5 rounded-full">
+                                    {{ item.product.category.name }}
+                                </span>
+                                {# Badge cubiertos si aplica #}
+                                {% if item.needs_cutlery %}
+                                <span class="ml-1 text-xs text-green-700 bg-green-50
+                                             border border-green-200 px-2 py-0.5 rounded-full">
+                                    🍴 Con cubiertos
+                                </span>
+                                {% endif %}
+                            </div>
+                            {# Botón eliminar ítem #}
+                            <button class="btn-remove-item flex-shrink-0 p-1.5 rounded-lg
+                                           hover:bg-red-50 text-gray-300 hover:text-red-500
+                                           transition-colors duration-150"
+                                    data-item-id="{{ item.id }}"
+                                    aria-label="Eliminar {{ item.product.name }} del carrito"
+                                    title="Eliminar del carrito">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {# Fila inferior: precio unitario + controles de cantidad + subtotal #}
+                        <div class="mt-3 flex items-center justify-between gap-3 flex-wrap">
+
+                            {# Precio unitario #}
+                            <span class="text-xs text-ceniza">
+                                ${{ item.price }} c/u
+                            </span>
+
+                            {# Control de cantidad: - número + #}
+                            <div class="flex items-center gap-2">
+                                <button class="btn-qty-minus w-8 h-8 rounded-lg bg-humo
+                                               hover:bg-gray-200 font-bold text-carbon
+                                               flex items-center justify-center transition
+                                               text-lg leading-none"
+                                        data-item-id="{{ item.id }}">−</button>
+
+                                <span class="qty-display w-8 text-center font-bold
+                                             text-carbon text-sm">
+                                    {{ item.quantity }}
+                                </span>
+
+                                <button class="btn-qty-plus w-8 h-8 rounded-lg bg-humo
+                                               hover:bg-gray-200 font-bold text-carbon
+                                               flex items-center justify-center transition
+                                               text-lg leading-none"
+                                        data-item-id="{{ item.id }}">+</button>
+                            </div>
+
+                            {# Subtotal del ítem (precio × cantidad) #}
+                            <span class="item-subtotal font-bold text-rappi text-sm">
+                                ${{ item.subtotal }}
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            {% else %}
+                {# ── Estado vacío: carrito sin ítems ──────────────────────────── #}
+                <div class="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm"
+                     id="empty-cart-msg">
+                    <div class="text-7xl mb-4 animate-bounce">🛒</div>
+                    <h2 class="text-xl font-extrabold text-carbon mb-2">
+                        Tu carrito está vacío
+                    </h2>
+                    <p class="text-ceniza text-sm mb-6 max-w-xs mx-auto">
+                        Aún no has agregado nada. ¡Explora nuestro menú y
+                        encuentra algo rico!
+                    </p>
+                    <a href="{% url 'store_app:catalog' %}"
+                       class="inline-block bg-rappi text-white font-bold px-8 py-3
+                              rounded-xl shadow-lg shadow-rappi/20
+                              hover:bg-rappiSoft hover:-translate-y-0.5
+                              active:scale-[0.98] transition-all duration-200">
+                        Ver el menú
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        {# ════════════════════════════════════════════════════════
+           COLUMNA DERECHA: Resumen del pedido (sticky)
+        ════════════════════════════════════════════════════════ #}
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm
+                        lg:sticky lg:top-24 overflow-hidden"
+                 id="order-summary">
+
+                <div class="p-5 border-b border-gray-50">
+                    <h2 class="font-extrabold text-carbon text-lg">Resumen del pedido</h2>
+                </div>
+
+                {% if items %}
+                <div class="p-5 space-y-3">
+
+                    {# Subtotal (se actualiza via JS al cambiar cantidades) #}
+                    <div class="flex justify-between text-sm text-ceniza">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">${{ cart.total }}</span>
+                    </div>
+
+                    {# Costo de envío — lógica: gratis si supera umbral #}
+                    <div class="flex justify-between text-sm text-ceniza">
+                        <span>Envío</span>
+                        <span id="summary-delivery" class="text-green-600 font-medium">
+                            {% if cart.total >= 25000 %}
+                                Gratis 🎉
+                            {% else %}
+                                $3.500
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    {# Separador visual #}
+                    <div class="border-t border-dashed border-gray-200 pt-3 mt-2">
+                        <div class="flex justify-between font-extrabold text-carbon text-lg">
+                            <span>Total</span>
+                            <span id="summary-total" class="text-rappi">
+                                {% if cart.total >= 25000 %}
+                                    ${{ cart.total }}
+                                {% else %}
+                                    {# En el backend calcularías esto con lógica real #}
+                                    ${{ cart.total }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    {# Banner envío gratis si aplica #}
+                    {% if cart.total < 25000 %}
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs
+                                text-amber-800 flex items-start gap-2">
+                        <span>ℹ️</span>
+                        <span>
+                            Agrega
+                            <strong>${{ 25000|floatformat:0 }}</strong>
+                            más y el envío será gratis.
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-3 text-xs
+                                text-green-800 flex items-center gap-2">
+                        <span>✅</span>
+                        <span>¡Tienes envío gratis en este pedido!</span>
+                    </div>
+                    {% endif %}
+
+                    {# CTA principal: ir a checkout #}
+                    <a href="#"
+                       class="block w-full bg-rappi text-white text-center font-bold
+                              py-4 rounded-xl shadow-lg shadow-rappi/20
+                              hover:bg-rappiSoft hover:-translate-y-0.5
+                              active:scale-[0.98] transition-all duration-200 mt-2">
+                        Ir a pagar →
+                    </a>
+
+                    {# Link secundario: seguir comprando #}
+                    <a href="{% url 'store_app:catalog' %}"
+                       class="block w-full text-center text-sm text-ceniza
+                              hover:text-rappi transition py-2 font-medium">
+                        ← Seguir comprando
+                    </a>
+                </div>
+
+                {% else %}
+                {# Panel deshabilitado si el carrito está vacío #}
+                <div class="p-5 opacity-40 select-none space-y-3">
+                    <div class="flex justify-between text-sm text-ceniza">
+                        <span>Subtotal</span><span>$0</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-ceniza">
+                        <span>Envío</span><span>—</span>
+                    </div>
+                    <div class="border-t border-dashed border-gray-200 pt-3">
+                        <div class="flex justify-between font-extrabold text-carbon text-lg">
+                            <span>Total</span><span>$0</span>
+                        </div>
+                    </div>
+                    <button disabled
+                            class="w-full bg-gray-200 text-gray-400 font-bold py-4
+                                   rounded-xl cursor-not-allowed mt-2">
+                        Ir a pagar
+                    </button>
+                </div>
+                {% endif %}
+
+            </div>
+
+            {# ── Métodos de pago aceptados ────────────────────────────────── #}
+            <div class="mt-4 flex items-center justify-center gap-3 text-ceniza text-xs">
+                <span>🔒 Pago seguro</span>
+                <span class="flex gap-2 font-bold tracking-wide">
+                    <span class="bg-white border border-gray-200 px-2 py-0.5 rounded text-[10px]">VISA</span>
+                    <span class="bg-white border border-gray-200 px-2 py-0.5 rounded text-[10px]">MC</span>
+                    <span class="bg-white border border-gray-200 px-2 py-0.5 rounded text-[10px]">PSE</span>
+                </span>
+            </div>
+        </div>
+
+    </div>{# /grid #}
+</div>{# /min-h #}
+
+{% endblock %}
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   JavaScript del carrito
+   - Todas las acciones son AJAX (fetch) para no recargar la página
+   - Usamos el CSRF token de Django en cada POST
+   - Las URLs vienen de los atributos data-* para no hardcodear rutas
+══════════════════════════════════════════════════════════════════════════ #}
+{% block extra_js %}
+<script>
+    // ── Utilidad: leer la cookie CSRF que Django inyecta en el navegador ──
+    // Django requiere este token en TODOS los POST para evitar ataques CSRF.
+    function getCsrfToken() {
+        const name = 'csrftoken';
+        const cookie = document.cookie.split(';').find(c => c.trim().startsWith(name + '='));
+        return cookie ? decodeURIComponent(cookie.trim().split('=')[1]) : '';
+    }
+
+    // ── Utilidad: mostrar un toast de notificación ──────────────────────
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        const toastIcon = document.getElementById('toast-icon');
+
+        toastMsg.textContent = msg;
+        toastIcon.textContent = isError ? '✕' : '✓';
+        toast.classList.toggle('bg-red-600', isError);
+        toast.classList.toggle('bg-carbon', !isError);
+
+        // Animar entrada
+        toast.style.transform = 'translateX(0)';
+        // Animar salida después de 2.5s
+        setTimeout(() => { toast.style.transform = 'translateX(120%)'; }, 2500);
+    }
+
+    // ── Función POST genérica con fetch ─────────────────────────────────
+    // Centraliza la lógica de llamadas AJAX para no repetirla en cada acción.
+    async function postToCart(url, body = {}) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),   // Header requerido por Django
+            },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+
+    // ── Actualiza el badge de items en el navbar (si existe) ────────────
+    function updateNavBadge(count) {
+        const badge = document.getElementById('nav-cart-badge');
+        if (badge) badge.textContent = count;
+    }
+
+    // ── Eliminar un ítem del carrito ─────────────────────────────────────
+    // Enviamos POST a /carrito/eliminar/<id>/
+    // Si la respuesta es exitosa, removemos la tarjeta del DOM con animación.
+    async function removeItem(itemId) {
+        try {
+            const data = await postToCart(`/carrito/eliminar/${itemId}/`);
+            if (data.success) {
+                const el = document.getElementById(`item-${itemId}`);
+                // Animación de salida antes de remover del DOM
+                el.style.transition = 'opacity 0.25s, transform 0.25s';
+                el.style.opacity = '0';
+                el.style.transform = 'translateX(20px)';
+                setTimeout(() => {
+                    el.remove();
+                    checkEmptyCart();
+                }, 250);
+                // Actualizar total en el resumen lateral
+                document.getElementById('summary-subtotal').textContent = `$${data.cart_total}`;
+                document.getElementById('summary-total').textContent = `$${data.cart_total}`;
+                showToast('Producto eliminado');
+            }
+        } catch (e) {
+            showToast('Error al eliminar', true);
+        }
+    }
+
+    // ── Vaciar todo el carrito ───────────────────────────────────────────
+    async function clearCart() {
+        if (!confirm('¿Vaciar todo el carrito?')) return;
+        try {
+            const data = await postToCart('/carrito/vaciar/');
+            if (data.success) {
+                // Remover todos los ítems del DOM
+                document.querySelectorAll('.cart-item').forEach(el => el.remove());
+                checkEmptyCart();
+                showToast('Carrito vaciado');
+            }
+        } catch (e) {
+            showToast('Error al vaciar', true);
+        }
+    }
+
+    // ── Verificar si el carrito quedó vacío tras una acción ─────────────
+    // Si no quedan ítems, mostramos el estado vacío dinámicamente.
+    function checkEmptyCart() {
+        const container = document.getElementById('cart-items-container');
+        const items = container.querySelectorAll('.cart-item');
+        if (items.length === 0) {
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm">
+                    <div class="text-7xl mb-4">🛒</div>
+                    <h2 class="text-xl font-extrabold text-carbon mb-2">Tu carrito está vacío</h2>
+                    <p class="text-ceniza text-sm mb-6">¡Agrega algo delicioso!</p>
+                    <a href="/tienda/" class="inline-block bg-rappi text-white font-bold
+                       px-8 py-3 rounded-xl hover:bg-rappiSoft transition">Ver el menú</a>
+                </div>`;
+            // Resetear el panel de resumen
+            document.getElementById('summary-subtotal').textContent = '$0';
+            document.getElementById('summary-total').textContent = '$0';
+        }
+    }
+
+    // ── Registrar todos los event listeners al cargar el DOM ────────────
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Botón "Vaciar carrito"
+        const btnClear = document.getElementById('btn-clear-cart');
+        if (btnClear) btnClear.addEventListener('click', clearCart);
+
+        // Botones "Eliminar ítem" (delegación de eventos en el contenedor)
+        // Usamos delegación en lugar de un listener por botón para mayor rendimiento.
+        document.getElementById('cart-items-container')
+            .addEventListener('click', async (e) => {
+
+                // Detectar click en botón de eliminar
+                const removeBtn = e.target.closest('.btn-remove-item');
+                if (removeBtn) {
+                    await removeItem(removeBtn.dataset.itemId);
+                }
+
+                // Detectar click en botón de RESTAR cantidad
+                const minusBtn = e.target.closest('.btn-qty-minus');
+                if (minusBtn) {
+                    const itemId = minusBtn.dataset.itemId;
+                    const qtyEl = minusBtn.nextElementSibling; // El span con la cantidad
+                    let qty = parseInt(qtyEl.textContent);
+
+                    if (qty <= 1) {
+                        // Si llega a 0, eliminar el ítem directamente
+                        await removeItem(itemId);
+                    } else {
+                        qty--;
+                        qtyEl.textContent = qty;
+                        updateSubtotal(itemId, qty);
+                        // En producción: llamar al backend para persistir el cambio
+                    }
+                }
+
+                // Detectar click en botón de SUMAR cantidad
+                const plusBtn = e.target.closest('.btn-qty-plus');
+                if (plusBtn) {
+                    const itemId = plusBtn.dataset.itemId;
+                    const qtyEl = plusBtn.previousElementSibling;
+                    let qty = parseInt(qtyEl.textContent);
+                    if (qty < 99) {
+                        qty++;
+                        qtyEl.textContent = qty;
+                        updateSubtotal(itemId, qty);
+                    }
+                }
+            });
+    });
+
+    // ── Recalcular subtotal del ítem y el total del resumen ─────────────
+    // Se ejecuta localmente (sin llamar al backend) para dar feedback inmediato.
+    // En producción, también harías un debounce + POST al backend.
+    function updateSubtotal(itemId, newQty) {
+        const card = document.getElementById(`item-${itemId}`);
+        const unitPrice = parseFloat(card.dataset.price);
+        const subtotal = (unitPrice * newQty).toLocaleString('es-CO');
+
+        // Actualizar subtotal del ítem
+        card.querySelector('.item-subtotal').textContent = `$${subtotal}`;
+
+        // Recalcular total sumando todos los subtotales visibles
+        let total = 0;
+        document.querySelectorAll('.cart-item').forEach(el => {
+            const price = parseFloat(el.dataset.price);
+            const qty = parseInt(el.querySelector('.qty-display').textContent);
+            total += price * qty;
+        });
+
+        document.getElementById('summary-subtotal').textContent =
+            `$${total.toLocaleString('es-CO')}`;
+        document.getElementById('summary-total').textContent =
+            `$${total.toLocaleString('es-CO')}`;
+    }
+</script>
+{% endblock %}

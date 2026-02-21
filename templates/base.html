@@ -55,6 +55,27 @@
         <!-- Login / Registro (sin sesión) | Cuenta / Cerrar sesión (con sesión) -->
         <div class="flex items-center gap-2">
             {% if user.is_authenticated %}
+            <a href="{% url 'cart_app:cart-detail' %}"
+               class="relative p-2 rounded-xl hover:bg-humo transition mr-1">
+                <svg class="w-6 h-6 text-carbon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 3h2l.4 2M7 13h10l4-16H5.4M7 13L5.4 5M7 13l-1.5 8M17 13l1.5 8M9 21h6"/>
+                </svg>
+                <span id="nav-cart-badge"
+                      class="absolute -top-1 -right-1 w-5 h-5 bg-rappi text-white
+                             text-[10px] font-bold rounded-full hidden items-center justify-center">
+                    0
+                </span>
+            </a>
+        {% endif %}
+            
+            <a href="{% url 'cart_app:cart-detail' %}" class="relative">
+                <svg class="w-6 h-6 text-carbon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                <span class="absolute top-0 right-0 bg-rappi text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">0</span>
+            </a>
+            {% if user.is_authenticated %}
                 <span class="text-sm text-ceniza hidden sm:inline">{{ user.username }}</span>
                 <a href="{% url 'users_app:user-logout' %}"
                     class="border-2 border-carbon/20 text-carbon px-4 py-1.5 rounded-full font-bold hover:bg-carbon/5 transition text-sm">
