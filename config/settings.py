@@ -121,9 +121,9 @@ USE_I18N = True
 USE_TZ = True
 
 # Auth (login/logout redirects)
-LOGIN_REDIRECT_URL = '/'
+LLOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
+LOGIN_URL = '/usuarios/login/'   # ← Esta línea faltaba
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
