@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="flex min-h-[calc(100vh-76px)]">
+    <!-- Botón menú hamburguesa (visible en todas las pantallas) -->
+    <button id="btn-menu-hamburger" class="fixed top-20 left-4 z-40 bg-white rounded-full p-2.5 shadow-lg border border-humo hover:bg-humo transition" aria-label="Abrir menú">
+        <svg id="icon-hamburger" class="w-6 h-6 text-carbon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg id="icon-close" class="w-6 h-6 text-carbon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+
+    <!-- Barra lateral - Menú hamburguesa (siempre colapsable) -->
+    <aside id="sidebar" class="w-72 flex-shrink-0 bg-white border-r border-humo overflow-y-auto transform -translate-x-full fixed inset-y-0 left-0 z-30 pt-20 transition-transform duration-300 ease-in-out shadow-xl">
+        <div class="p-6 space-y-6">
+            <div>
+                <div class="rounded-2xl overflow-hidden bg-humo aspect-[16/9] mb-4">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=600" alt="Comida rápida" class="w-full h-full object-cover">
+                </div>
+                <h2 class="font-bold text-carbon text-lg">API<span class="text-rappi">food</span></h2>
+                <p class="text-sm text-ceniza">Tu comida favorita a domicilio</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="text-yellow-500">★</span>
+                    <span class="text-sm font-medium">4.5</span>
+                </div>
+            </div>
+
+            <nav class="space-y-1">
+                <p class="text-xs font-bold text-ceniza uppercase tracking-wider mb-3 px-2">Categorías</p>
+                {% for category in categories %}
+                <a href="#{{ category.slug }}" class="category-link flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-humo transition group">
+                    <span class="font-medium text-carbon group-hover:text-rappi">{{ category.emoji }} {{ category.name }}</span>
+                    <span class="text-ceniza group-hover:text-rappi">›</span>
+                </a>
+                {% empty %}
+                <p class="text-sm text-ceniza px-2">Sin categorías. Agrega en el <a href="{% url 'admin:store_category_changelist' %}" class="text-rappi underline">admin</a>.</p>
+                {% endfor %}
+            </nav>
+
+            <div class="p-3 rounded-xl bg-green-50 border border-green-100">
+                <p class="text-sm font-bold text-green-800">Envío gratis</p>
+                <p class="text-xs text-green-600">En tu primer pedido</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay para cerrar menú -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-carbon/40 z-20 opacity-0 pointer-events-none transition-opacity duration-300" aria-hidden="true"></div>
+
+    <!-- Modal ventana flotante del producto -->
+    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="product-modal-backdrop" class="absolute inset-0 bg-carbon/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-[slideUp_0.3s_ease-out]">
+            <button id="product-modal-close" class="absolute top-4 right-4 z-10 p-2 rounded-full bg-humo hover:bg-gray-200 transition" aria-label="Cerrar">
+                <svg class="w-5 h-5 text-carbon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <div class="p-6">
+                <img id="modal-product-image" src="" alt="" class="w-full h-48 md:h-56 object-cover rounded-xl mb-4 bg-humo">
+                <h3 id="modal-product-name" class="text-xl font-extrabold text-carbon mb-2"></h3>
+                <p id="modal-product-description" class="text-ceniza text-sm mb-4"></p>
+                <p id="modal-product-price" class="text-rappi font-bold text-2xl mb-6"></p>
+
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-bold text-carbon mb-2">Cantidad</label>
+                        <div class="flex items-center gap-3">
+                            <button type="button" id="qty-minus" class="w-10 h-10 rounded-xl bg-humo hover:bg-gray-200 font-bold text-carbon flex items-center justify-center transition">−</button>
+                            <input type="number" id="product-qty" value="1" min="1" max="99" class="w-16 text-center border border-humo rounded-xl py-2 font-bold text-carbon">
+                            <button type="button" id="qty-plus" class="w-10 h-10 rounded-xl bg-humo hover:bg-gray-200 font-bold text-carbon flex items-center justify-center transition">+</button>
+                        </div>
+                    </div>
+
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="product-cubiertos" class="w-4 h-4 rounded border-gray-300 text-rappi focus:ring-rappi">
+                        <span class="text-sm font-medium text-carbon">¿Necesita cubiertos?</span>
+                    </label>
+                </div>
+
+                <button type="button" id="btn-add-to-cart" class="w-full bg-rappi text-white font-bold py-4 rounded-xl hover:bg-rappiSoft transition shadow-lg shadow-rappi/20">
+                    Agregar al carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main class="flex-1 overflow-y-auto p-4 pl-16 md:p-8 md:pl-20 lg:p-10 lg:pl-24">
+        <nav class="text-sm text-ceniza mb-6">
+            <a href="{% url 'landing' %}" class="hover:text-rappi">Inicio</a>
+            <span class="mx-1">›</span>
+            <span class="text-carbon">Catálogo</span>
+        </nav>
+
+        <div class="flex flex-wrap gap-3 mb-8">
+            <div class="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl text-blue-700 text-sm">
+                <span>✓</span>
+                <span>Envío gratis en pedidos +$25.000</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-xl text-amber-700 text-sm">
+                <span>ℹ</span>
+                <span>Hasta 20% OFF en combos</span>
+            </div>
+        </div>
+
+        {% for category in categories %}
+        <section id="{{ category.slug }}" class="mb-12 scroll-mt-24">
+            <h2 class="text-2xl font-extrabold text-carbon mb-6 flex items-center gap-2">{{ category.emoji }} {{ category.name }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for product in category.products.all %}
+                <article class="product-card cursor-pointer bg-white rounded-2xl p-4 border border-humo hover:shadow-soft hover:border-rappi/20 transition-all flex gap-4 group" data-name="{{ product.name }}" data-description="{{ product.description }}" data-price="{{ product.price }}" data-image="{{ product.image_url|default:'' }}">
+                    <div class="flex-1 min-w-0">
+                        {% if product.is_promo %}
+                        <span class="text-xs font-bold text-rappi bg-rappi/10 px-2 py-0.5 rounded">Promo</span>
+                        {% endif %}
+                        <h3 class="font-bold text-carbon group-hover:text-rappi transition">{{ product.name }}</h3>
+                        <p class="text-sm text-ceniza line-clamp-2">{{ product.description|default:"" }}</p>
+                        <p class="text-rappi font-bold text-lg mt-2">${{ product.price }}</p>
+                    </div>
+                    <div class="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-humo">
+                        {% if product.image_url %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover group-hover:scale-110 transition">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-ceniza text-2xl">🍽</div>
+                        {% endif %}
+                    </div>
+                </article>
+                {% empty %}
+                <p class="text-ceniza text-sm col-span-full">No hay productos en esta categoría.</p>
+                {% endfor %}
+            </div>
+        </section>
+        {% empty %}
+        <p class="text-ceniza">No hay categorías. <a href="{% url 'admin:store_category_add' %}" class="text-rappi underline">Crea una en el admin</a>.</p>
+        {% endfor %}
+    </main>
+</div>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/catalog.js' %}"></script>
+{% endblock %}

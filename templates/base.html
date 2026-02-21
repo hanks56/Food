@@ -1,0 +1,82 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>APIfood | Tu comida favorita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rappi: "#FF5722",
+                        rappiSoft: "#FF8A65",
+                        carbon: "#1A1A1B",
+                        ceniza: "#5E5E5E",
+                        humo: "#F2F2F2",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    boxShadow: {
+                        soft: "0 4px 20px rgba(0,0,0,0.08)",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-carbon">
+    <nav class="flex justify-between items-center px-8 py-4 bg-white sticky top-0 z-50 shadow-sm">
+        <a href="{% url 'landing' %}" 
+            class="text-2xl font-extrabold text-rappi tracking-tighter">
+            API<span class="text-carbon">food</span>
+        </a>
+
+        
+        
+
+        <div class="space-x-6 hidden md:flex font-medium text-ceniza">
+            <a href="{% url 'store_app:catalog' %}" class="hover:text-rappi transition">Menú</a>
+            <a href="#" class="hover:text-rappi transition">Promociones</a>
+            <a href="#" class="hover:text-rappi transition">Nosotros</a>
+        </div>
+
+        <!-- Login / Registro (sin sesión) | Cuenta / Cerrar sesión (con sesión) -->
+        <div class="flex items-center gap-2">
+            {% if user.is_authenticated %}
+                <span class="text-sm text-ceniza hidden sm:inline">{{ user.username }}</span>
+                <a href="{% url 'users_app:user-logout' %}"
+                    class="border-2 border-carbon/20 text-carbon px-4 py-1.5 rounded-full font-bold hover:bg-carbon/5 transition text-sm">
+                    Cerrar sesión
+                </a>
+            {% else %}
+                <a href="{% url 'users_app:user-login' %}"
+                    class="border-2 border-rappi text-rappi px-4 py-1.5 rounded-full font-bold hover:bg-rappi hover:text-white transition text-sm">
+                    Iniciar sesión
+                </a>
+                <a href="{% url 'users_app:user-register' %}"
+                    class="bg-rappi text-white px-4 py-1.5 rounded-full font-bold hover:bg-rappiSoft transition text-sm">
+                    Registrarse
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main>{% block content %} {% endblock %}</main>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="relative bg-white py-16 px-8 md:px-20 flex flex-col md:flex-row items-center justify-between overflow-hidden">
+    <div class="md:w-1/2 z-10">
+        <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+            Tu hamburguesa <br> <span class="text-rappi">favorita,</span> <br> en un click.
+        </h1>
+        <p class="text-ceniza text-lg mb-8 max-w-md">
+            Pide los mejores platos de la ciudad con entrega ultra rápida y la calidad que te mereces.
+        </p>
+        <button id="btn-order" class="bg-rappi text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:scale-105 transition-transform">
+            Pedir ahora
+        </button>
+    </div>
+
+    <div class="md:w-1/2 mt-12 md:mt-0 flex justify-center relative">
+        <div class="w-80 h-80 md:w-[450px] md:h-[450px] bg-carbon rounded-[100px] rotate-3 overflow-hidden shadow-2xl border-8 border-humo">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=800" 
+                 alt="Hero Burger" class="w-full h-full object-cover -rotate-3 scale-110">
+        </div>
+    </div>
+</section>
+
+<section class="bg-humo py-20 px-8 md:px-20">
+    <div class="flex justify-between items-end mb-12">
+        <div>
+            <h2 class="text-3xl font-extrabold mb-2">Populares hoy</h2>
+            <div class="h-1 w-20 bg-rappi"></div>
+        </div>
+        <button class="text-rappi font-bold flex items-center gap-2 hover:underline">
+            Ver Menú Completo <span>&rarr;</span>
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-3xl shadow-soft hover:shadow-xl transition group">
+            <div class="overflow-hidden rounded-2xl mb-4 bg-humo aspect-square">
+                <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&q=80&w=500" class="group-hover:scale-110 transition duration-500">
+            </div>
+            <h3 class="font-bold text-xl mb-1">Classic Burger 🔥</h3>
+            <p class="text-rappiSoft font-bold text-lg">$14.00</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-soft hover:shadow-xl transition group">
+            <div class="overflow-hidden rounded-2xl mb-4 bg-humo aspect-square">
+                <img src="https://images.unsplash.com/photo-1573014167391-26d91f239e58?auto=format&fit=crop&q=80&w=500" class="group-hover:scale-110 transition duration-500">
+            </div>
+            <h3 class="font-bold text-xl mb-1">Papas Medianas</h3>
+            <p class="text-rappiSoft font-bold text-lg">$10.00</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-soft hover:shadow-xl transition group">
+            <div class="overflow-hidden rounded-2xl mb-4 bg-humo aspect-square">
+                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=500" class="group-hover:scale-110 transition duration-500">
+            </div>
+            <h3 class="font-bold text-xl mb-1">Pizza Elite</h3>
+            <p class="text-rappiSoft font-bold text-lg">$15.00</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
