@@ -5,12 +5,11 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
-from config.firebase_service import sync_user_to_firebase
 from .forms import CustomLoginForm, UserRegisterForm
 
 
 class UserRegisterView(FormView):
-    """Registro de usuario: guarda en Django + sincroniza con Firebase."""
+    """Registro de usuario en Django."""
     template_name = "users/register.html"
     form_class = UserRegisterForm
     success_url = reverse_lazy("users_app:user-login")
@@ -21,17 +20,10 @@ class UserRegisterView(FormView):
         first_name = data["first_name"].strip()
         last_name = data["last_name"].strip()
 
-        user = User.objects.create_user(
+        User.objects.create_user(
             username=email,
             email=email,
             password=data["password"],
-            first_name=first_name,
-            last_name=last_name,
-        )
-
-        sync_user_to_firebase(
-            user_id=user.id,
-            email=email,
             first_name=first_name,
             last_name=last_name,
         )
