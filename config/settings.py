@@ -121,7 +121,7 @@ USE_I18N = True
 USE_TZ = True
 
 # Auth (login/logout redirects)
-LLOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/tienda/catalogo/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/usuarios/login/'   # ← Esta línea faltaba
 # Static files (CSS, JavaScript, Images)

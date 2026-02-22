@@ -5,9 +5,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>APIfood | Tu comida favorita</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" /> <!-- Fuentes -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>  <!-- ✅ AGREGAR AQUÍ — Lucide Icons (la que mejor combina con Tailwind) -->   
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -77,10 +77,14 @@
             </a>
             {% if user.is_authenticated %}
                 <span class="text-sm text-ceniza hidden sm:inline">{{ user.username }}</span>
-                <a href="{% url 'users_app:user-logout' %}"
-                    class="border-2 border-carbon/20 text-carbon px-4 py-1.5 rounded-full font-bold hover:bg-carbon/5 transition text-sm">
-                    Cerrar sesión
-                </a>
+                <form method="post" action="{% url 'users_app:user-logout' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="border-2 border-carbon/20 text-carbon px-4 py-1.5 rounded-full 
+                                   font-bold hover:bg-carbon/5 transition text-sm cursor-pointer bg-transparent">
+                        Cerrar sesión
+                    </button>
+                </form>
             {% else %}
                 <a href="{% url 'users_app:user-login' %}"
                     class="border-2 border-rappi text-rappi px-4 py-1.5 rounded-full font-bold hover:bg-rappi hover:text-white transition text-sm">
@@ -98,6 +102,8 @@
 
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
+
+    
 </body>
 
 </html>
