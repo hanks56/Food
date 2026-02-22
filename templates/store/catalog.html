@@ -112,7 +112,7 @@
             <h2 class="text-2xl font-extrabold text-carbon mb-6 flex items-center gap-2">{{ category.emoji }} {{ category.name }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for product in category.products.all %}
-                <article class="product-card cursor-pointer bg-white rounded-2xl p-4 ..."
+                <article class="product-card cursor-pointer bg-white rounded-2xl p-4 ...
                 data-id="{{ product.id }}"
                 data-name="{{ product.name }}"
                 data-description="{{ product.description }}"
