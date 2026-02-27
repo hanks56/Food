@@ -323,12 +323,87 @@
     </main>
 </div>
 
+<!-- ══════════════════════════════════════════
+     MODAL: Login requerido (usuario no autenticado)
+══════════════════════════════════════════ -->
+<div id="login-required-modal"
+     class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4
+            opacity-0 pointer-events-none transition-opacity duration-300">
+    <!-- Backdrop -->
+    <div id="login-modal-backdrop"
+         class="absolute inset-0 bg-[#1A1A1B]/70 backdrop-blur-md"></div>
+
+    <!-- Panel -->
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm
+                translate-y-8 sm:translate-y-0 transition-transform duration-300"
+         id="login-modal-panel">
+
+        <!-- Franja de color arriba -->
+        <div class="h-2 bg-gradient-to-r from-[#FF5722] to-[#FF8A65] rounded-t-3xl"></div>
+
+        <div class="p-7 text-center">
+            <!-- Ícono animado -->
+            <div class="w-20 h-20 bg-orange-50 border-4 border-orange-100 rounded-full
+                        flex items-center justify-center text-4xl mx-auto mb-5
+                        animate-[bounce_1s_ease_1]">
+                🔐
+            </div>
+
+            <h3 class="font-display text-2xl text-[#1A1A1B] mb-2">
+                ¡Ups! Necesitas una cuenta
+            </h3>
+            <p class="text-[#5E5E5E] text-sm leading-relaxed mb-7">
+                Para agregar productos al carrito debes iniciar sesión o
+                crear una cuenta gratis. ¡Solo toma un minuto!
+            </p>
+
+            <!-- Botones de acción -->
+            <div class="space-y-3">
+                <a href="{% url 'users_app:user-register' %}"
+                   class="flex items-center justify-center gap-2 w-full bg-[#FF5722] text-white
+                          font-bold py-3.5 rounded-2xl shadow-lg shadow-orange-200
+                          hover:bg-[#FF8A65] hover:-translate-y-0.5 active:scale-[0.98]
+                          transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Crear cuenta gratis
+                </a>
+                <a href="{% url 'users_app:user-login' %}"
+                   class="flex items-center justify-center gap-2 w-full border-2 border-[#1A1A1B]/10
+                          text-[#1A1A1B] font-bold py-3.5 rounded-2xl
+                          hover:border-[#FF5722] hover:text-[#FF5722]
+                          transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                              d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    Ya tengo cuenta
+                </a>
+                <!-- Cerrar -->
+                <button id="login-modal-close"
+                        class="w-full text-sm text-[#5E5E5E] hover:text-[#FF5722]
+                               transition py-2 font-medium">
+                    Seguir viendo el menú
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     @keyframes slideUp {
         from { opacity: 0; transform: translateY(24px) scale(0.97); }
         to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 </style>
+
+{# Variable de autenticación para catalog.js — sin tocar lógica del backend #}
+<script>
+    window.IS_AUTHENTICATED = {% if user.is_authenticated %}true{% else %}false{% endif %};
+</script>
+
 {% endblock %}
 
 {% block extra_js %}
