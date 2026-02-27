@@ -1,62 +1,581 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="relative bg-white py-16 px-8 md:px-20 flex flex-col md:flex-row items-center justify-between overflow-hidden">
-    <div class="md:w-1/2 z-10">
-        <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
-            Tu hamburguesa <br> <span class="text-rappi">favorita,</span> <br> en un click.
-        </h1>
-        <p class="text-ceniza text-lg mb-8 max-w-md">
-            Pide los mejores platos de la ciudad con entrega ultra rápida y la calidad que te mereces.
-        </p>
-        <button id="btn-order" class="bg-rappi text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:scale-105 transition-transform">
-            Pedir ahora
-        </button>
-    </div>
 
-    <div class="md:w-1/2 mt-12 md:mt-0 flex justify-center relative">
-        <div class="w-80 h-80 md:w-[450px] md:h-[450px] bg-carbon rounded-[100px] rotate-3 overflow-hidden shadow-2xl border-8 border-humo">
-            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=800" 
-                 alt="Hero Burger" class="w-full h-full object-cover -rotate-3 scale-110">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+
+  /* ── Variables de diseño ── */
+  :root {
+    --rappi: #FF5722;
+    --rappi-soft: #FF8A65;
+    --carbon: #1A1A1B;
+    --cream: #FFF8F3;
+    --warm-gray: #F5F0EB;
+  }
+
+  /* ── Tipografía editorial ── */
+  .font-display { font-family: 'Syne', sans-serif; }
+  .font-body    { font-family: 'DM Sans', sans-serif; }
+
+  /* ── Animaciones de entrada escalonada ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-24px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(-2deg); }
+    50%       { transform: translateY(-16px) rotate(1deg); }
+  }
+  @keyframes floatBadge {
+    0%, 100% { transform: translateY(0) rotate(3deg); }
+    50%       { transform: translateY(-10px) rotate(5deg); }
+  }
+  @keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .anim-fade-up   { animation: fadeUp    0.7s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-fade-in   { animation: fadeIn    0.7s ease both; }
+  .anim-scale-in  { animation: scaleIn   0.7s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-slide-r   { animation: slideRight 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+  .d-100 { animation-delay: 0.10s; }
+  .d-200 { animation-delay: 0.20s; }
+  .d-300 { animation-delay: 0.30s; }
+  .d-400 { animation-delay: 0.40s; }
+  .d-500 { animation-delay: 0.55s; }
+  .d-600 { animation-delay: 0.70s; }
+
+  /* ── Imagen flotante del hero ── */
+  .hero-image { animation: float 5s ease-in-out infinite; }
+  .badge-float { animation: floatBadge 4s ease-in-out infinite; }
+
+  /* ── Gradiente de texto ── */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--rappi) 0%, #FF9800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Ruido de fondo sutil (textura) ── */
+  .noise-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Tarjetas de producto hover 3D ── */
+  .product-lift {
+    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
+                box-shadow 0.35s ease;
+  }
+  .product-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 24px 48px -12px rgba(255,87,34,0.18);
+  }
+
+  /* ── Marquee ticker ── */
+  .marquee-track { animation: marqueeScroll 22s linear infinite; }
+
+  /* ── Línea decorativa ── */
+  .deco-line {
+    height: 3px;
+    background: linear-gradient(90deg, var(--rappi), #FF9800, transparent);
+    border-radius: 9999px;
+  }
+
+  /* ── Separador ondulado ── */
+  .wave-divider { line-height: 0; }
+
+  /* ── Dot pulsante ── */
+  .pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+
+  /* ── Sombra de imagen hero ── */
+  .hero-shadow {
+    filter: drop-shadow(0 40px 60px rgba(255,87,34,0.25));
+  }
+
+  /* ── Override del nav de base.html ── */
+  body { font-family: 'DM Sans', sans-serif; }
+</style>
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 1: HERO
+════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-[#FFF8F3] min-h-[92vh] flex items-center noise-bg">
+
+  <!-- Círculo decorativo de fondo (naranja difuso) -->
+  <div class="absolute top-[-10%] right-[-5%] w-[55vw] h-[55vw] max-w-[700px] max-h-[700px]
+              rounded-full bg-gradient-to-br from-orange-100 to-amber-50 opacity-70 blur-3xl pointer-events-none">
+  </div>
+  <!-- Punto decorativo pequeño -->
+  <div class="absolute bottom-[15%] left-[8%] w-6 h-6 rounded-full bg-rappi opacity-30 pulse-dot"></div>
+  <div class="absolute top-[20%] right-[38%] w-3 h-3 rounded-full bg-amber-400 opacity-40 pulse-dot" style="animation-delay:0.7s"></div>
+
+  <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16
+              grid grid-cols-1 md:grid-cols-2 gap-12 items-center py-20 lg:py-0">
+
+    <!-- Texto izquierdo -->
+    <div class="space-y-6">
+
+      <!-- Chip "Nuevo" -->
+      <div class="anim-slide-r d-100 inline-flex items-center gap-2 bg-white border border-orange-100
+                  px-4 py-1.5 rounded-full shadow-sm text-sm font-semibold text-[#FF5722]">
+        <span class="w-2 h-2 bg-[#FF5722] rounded-full pulse-dot"></span>
+        Entregas en menos de 30 min
+      </div>
+
+      <!-- Titular principal -->
+      <h1 class="anim-fade-up d-200 font-display text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-[#1A1A1B]">
+        La comida<br>
+        que amas,<br>
+        <span class="text-gradient">en tu puerta.</span>
+      </h1>
+
+      <!-- Subtítulo -->
+      <p class="anim-fade-up d-300 text-[#5E5E5E] text-lg md:text-xl max-w-md leading-relaxed font-body">
+        Pide los mejores restaurantes de la ciudad con un solo clic.
+        Rápido, fresco y sin complicaciones.
+      </p>
+
+      <!-- CTAs -->
+      <div class="anim-fade-up d-400 flex flex-wrap items-center gap-4">
+        <a href="{% url 'store_app:catalog' %}"
+           class="group relative inline-flex items-center gap-2 bg-[#FF5722] text-white
+                  font-bold px-8 py-4 rounded-2xl text-base overflow-hidden
+                  shadow-lg shadow-orange-200 hover:shadow-xl hover:shadow-orange-300
+                  transition-all duration-300 hover:-translate-y-1">
+          <span class="relative z-10">Ver el menú</span>
+          <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+          <!-- Hover shimmer -->
+          <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent
+                       -translate-x-full group-hover:translate-x-full transition-transform duration-500"></span>
+        </a>
+
+        <a href="#como-funciona"
+           class="inline-flex items-center gap-2 text-[#1A1A1B] font-semibold px-5 py-4
+                  rounded-2xl hover:bg-white hover:shadow-md transition-all duration-300 text-base">
+          <svg class="w-5 h-5 text-[#FF5722]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          ¿Cómo funciona?
+        </a>
+      </div>
+
+      <!-- Social proof -->
+      <div class="anim-fade-up d-500 flex items-center gap-5 pt-2">
+        <!-- Avatares apilados -->
+        <div class="flex -space-x-3">
+          <img class="w-10 h-10 rounded-full border-2 border-white object-cover"
+               src="https://i.pravatar.cc/40?img=12" alt="Usuario">
+          <img class="w-10 h-10 rounded-full border-2 border-white object-cover"
+               src="https://i.pravatar.cc/40?img=23" alt="Usuario">
+          <img class="w-10 h-10 rounded-full border-2 border-white object-cover"
+               src="https://i.pravatar.cc/40?img=47" alt="Usuario">
+          <div class="w-10 h-10 rounded-full border-2 border-white bg-[#FF5722] flex items-center
+                      justify-center text-white text-xs font-bold">+8k</div>
         </div>
-    </div>
-</section>
-
-<section class="bg-humo py-20 px-8 md:px-20">
-    <div class="flex justify-between items-end mb-12">
         <div>
-            <h2 class="text-3xl font-extrabold mb-2">Populares hoy</h2>
-            <div class="h-1 w-20 bg-rappi"></div>
+          <div class="flex items-center gap-1">
+            <span class="text-amber-400 text-sm">★★★★★</span>
+          </div>
+          <p class="text-xs text-[#5E5E5E] font-medium">+8.000 pedidos este mes</p>
         </div>
-        <button class="text-rappi font-bold flex items-center gap-2 hover:underline">
-            Ver Menú Completo <span>&rarr;</span>
-        </button>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white p-6 rounded-3xl shadow-soft hover:shadow-xl transition group">
-            <div class="overflow-hidden rounded-2xl mb-4 bg-humo aspect-square">
-                <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&q=80&w=500" class="group-hover:scale-110 transition duration-500">
-            </div>
-            <h3 class="font-bold text-xl mb-1">Classic Burger 🔥</h3>
-            <p class="text-rappiSoft font-bold text-lg">$14.00</p>
-        </div>
+    <!-- Imagen derecha + badges flotantes -->
+    <div class="anim-scale-in d-200 relative flex justify-center items-center">
+      <!-- Círculo de fondo decorativo -->
+      <div class="absolute w-[90%] h-[90%] rounded-full bg-gradient-to-br from-orange-100 to-amber-100"></div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-soft hover:shadow-xl transition group">
-            <div class="overflow-hidden rounded-2xl mb-4 bg-humo aspect-square">
-                <img src="https://images.unsplash.com/photo-1573014167391-26d91f239e58?auto=format&fit=crop&q=80&w=500" class="group-hover:scale-110 transition duration-500">
-            </div>
-            <h3 class="font-bold text-xl mb-1">Papas Medianas</h3>
-            <p class="text-rappiSoft font-bold text-lg">$10.00</p>
+      <!-- Imagen principal -->
+      <div class="hero-image relative z-10 hero-shadow">
+        <div class="w-72 h-72 md:w-[400px] md:h-[400px] lg:w-[460px] lg:h-[460px]
+                    rounded-[40%] overflow-hidden border-4 border-white shadow-2xl">
+          <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=85&w=900"
+               alt="Hamburguesa premium"
+               class="w-full h-full object-cover scale-110">
         </div>
+      </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-soft hover:shadow-xl transition group">
-            <div class="overflow-hidden rounded-2xl mb-4 bg-humo aspect-square">
-                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=500" class="group-hover:scale-110 transition duration-500">
-            </div>
-            <h3 class="font-bold text-xl mb-1">Pizza Elite</h3>
-            <p class="text-rappiSoft font-bold text-lg">$15.00</p>
+      <!-- Badge: Envío gratis -->
+      <div class="badge-float absolute top-[8%] right-[4%] z-20 bg-white rounded-2xl px-4 py-3
+                  shadow-xl border border-green-100 flex items-center gap-2">
+        <span class="text-2xl">🛵</span>
+        <div>
+          <p class="text-xs font-bold text-green-700">Envío gratis</p>
+          <p class="text-[10px] text-[#5E5E5E]">En tu primer pedido</p>
         </div>
+      </div>
+
+      <!-- Badge: Tiempo -->
+      <div class="absolute bottom-[12%] left-[2%] z-20 bg-[#1A1A1B] text-white rounded-2xl px-4 py-3
+                  shadow-xl flex items-center gap-2"
+           style="animation: floatBadge 5s 1s ease-in-out infinite;">
+        <span class="text-2xl">⚡</span>
+        <div>
+          <p class="text-xs font-bold">~28 minutos</p>
+          <p class="text-[10px] text-gray-400">Tiempo estimado</p>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Ola inferior -->
+  <div class="wave-divider absolute bottom-0 left-0 w-full overflow-hidden leading-none">
+    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,40 C360,0 1080,80 1440,30 L1440,60 L0,60 Z" fill="white"/>
+    </svg>
+  </div>
 </section>
+
+
+<!-- ════════════════════════════════════════════
+     MARQUEE TICKER: categorías
+════════════════════════════════════════════ -->
+<div class="bg-white border-y border-gray-100 overflow-hidden py-3.5">
+  <div class="marquee-track flex items-center gap-8 w-max">
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍕 Pizza</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍔 Hamburguesas</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🌭 Perros Calientes</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍗 Alitas</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🎯 Combos</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥤 Bebidas</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍰 Postres</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥗 Saludables</span>
+    <span class="text-gray-200">·</span>
+    {# Repetición para el efecto de loop infinito del marquee #}
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍕 Pizza</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍔 Hamburguesas</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🌭 Perros Calientes</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍗 Alitas</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🎯 Combos</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥤 Bebidas</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍰 Postres</span>
+    <span class="text-gray-200">·</span>
+    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥗 Saludables</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 2: POPULARES
+════════════════════════════════════════════ -->
+<section class="bg-white py-20 px-6 md:px-12 lg:px-16">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Encabezado de sección -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+      <div>
+        <p class="text-[#FF5722] font-bold text-sm uppercase tracking-widest mb-2">⭐ Lo más pedido</p>
+        <h2 class="font-display text-4xl md:text-5xl text-[#1A1A1B] leading-tight">
+          Populares hoy
+        </h2>
+        <div class="deco-line w-16 mt-3"></div>
+      </div>
+      <a href="{% url 'store_app:catalog' %}"
+         class="group inline-flex items-center gap-2 text-[#FF5722] font-bold
+                hover:gap-3 transition-all duration-200 text-sm">
+        Ver menú completo
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Grid de productos populares -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Producto 1 -->
+      <a href="{% url 'store_app:catalog' %}"
+         class="product-lift group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer block">
+        <div class="relative overflow-hidden aspect-[4/3] bg-[#F5F0EB]">
+          <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=600"
+               alt="Classic Burger"
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <span class="absolute top-4 left-4 bg-[#FF5722] text-white text-xs font-bold
+                       px-3 py-1 rounded-full">🔥 Top ventas</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h3 class="font-display text-xl text-[#1A1A1B]">Classic Burger</h3>
+              <p class="text-[#5E5E5E] text-sm mt-0.5">Carne, lechuga, tomate y salsa especial.</p>
+            </div>
+            <span class="text-[#FF5722] font-bold text-xl whitespace-nowrap">$18.000</span>
+          </div>
+          <div class="flex items-center gap-1 mt-3">
+            <span class="text-amber-400 text-xs">★★★★★</span>
+            <span class="text-xs text-[#5E5E5E]">(412)</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Producto 2 (grande, destacado) -->
+      <a href="{% url 'store_app:catalog' %}"
+         class="product-lift group bg-[#1A1A1B] rounded-3xl overflow-hidden shadow-sm cursor-pointer block sm:col-span-2 lg:col-span-1">
+        <div class="relative overflow-hidden aspect-[4/3] bg-gray-800">
+          <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=600"
+               alt="Pizza Elite"
+               class="w-full h-full object-cover opacity-80 group-hover:opacity-95 group-hover:scale-105 transition-all duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#1A1A1B]/80 to-transparent"></div>
+          <span class="absolute top-4 left-4 bg-amber-400 text-[#1A1A1B] text-xs font-bold
+                       px-3 py-1 rounded-full">⭐ Destacado</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h3 class="font-display text-xl text-white">Pizza Margherita</h3>
+              <p class="text-gray-400 text-sm mt-0.5">Salsa de tomate, mozzarella y albahaca fresca.</p>
+            </div>
+            <span class="text-[#FF8A65] font-bold text-xl whitespace-nowrap">$22.000</span>
+          </div>
+          <div class="flex items-center gap-1 mt-3">
+            <span class="text-amber-400 text-xs">★★★★★</span>
+            <span class="text-xs text-gray-400">(287)</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Producto 3 -->
+      <a href="{% url 'store_app:catalog' %}"
+         class="product-lift group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer block">
+        <div class="relative overflow-hidden aspect-[4/3] bg-[#F5F0EB]">
+          <img src="https://images.unsplash.com/photo-1567620832903-0fc676de3866?auto=format&fit=crop&q=80&w=600"
+               alt="Alitas BBQ"
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <span class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold
+                       px-3 py-1 rounded-full">🎉 Promo</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h3 class="font-display text-xl text-[#1A1A1B]">Alitas BBQ x8</h3>
+              <p class="text-[#5E5E5E] text-sm mt-0.5">8 piezas con salsa barbecue.</p>
+            </div>
+            <span class="text-[#FF5722] font-bold text-xl whitespace-nowrap">$18.000</span>
+          </div>
+          <div class="flex items-center gap-1 mt-3">
+            <span class="text-amber-400 text-xs">★★★★☆</span>
+            <span class="text-xs text-[#5E5E5E]">(198)</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 3: STATS
+════════════════════════════════════════════ -->
+<section class="bg-[#1A1A1B] py-16 px-6 md:px-12 lg:px-16">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+
+    <div class="space-y-2">
+      <p class="font-display text-4xl md:text-5xl text-white">8k+</p>
+      <p class="text-gray-400 text-sm font-medium">Pedidos al mes</p>
+    </div>
+    <div class="space-y-2">
+      <p class="font-display text-4xl md:text-5xl text-[#FF8A65]">28<span class="text-2xl">min</span></p>
+      <p class="text-gray-400 text-sm font-medium">Entrega promedio</p>
+    </div>
+    <div class="space-y-2">
+      <p class="font-display text-4xl md:text-5xl text-white">50+</p>
+      <p class="text-gray-400 text-sm font-medium">Restaurantes</p>
+    </div>
+    <div class="space-y-2">
+      <p class="font-display text-4xl md:text-5xl text-[#FF8A65]">4.8<span class="text-2xl">★</span></p>
+      <p class="text-gray-400 text-sm font-medium">Calificación promedio</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 4: CÓMO FUNCIONA
+════════════════════════════════════════════ -->
+<section id="como-funciona" class="bg-[#FFF8F3] py-20 px-6 md:px-12 lg:px-16">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="text-center mb-14">
+      <p class="text-[#FF5722] font-bold text-sm uppercase tracking-widest mb-2">Simple como 1, 2, 3</p>
+      <h2 class="font-display text-4xl md:text-5xl text-[#1A1A1B]">¿Cómo funciona?</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+      <!-- Línea conectora (solo desktop) -->
+      <div class="hidden md:block absolute top-12 left-[20%] right-[20%] h-px bg-gradient-to-r
+                  from-transparent via-orange-200 to-transparent"></div>
+
+      <!-- Paso 1 -->
+      <div class="relative text-center space-y-4 bg-white rounded-3xl p-8 shadow-sm
+                  border border-orange-50 hover:shadow-md transition-shadow">
+        <div class="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center
+                    text-4xl mx-auto border-2 border-orange-100">
+          🍔
+        </div>
+        <span class="absolute top-5 right-5 font-display text-5xl text-orange-100 select-none">01</span>
+        <h3 class="font-display text-xl text-[#1A1A1B]">Elige tu comida</h3>
+        <p class="text-[#5E5E5E] text-sm leading-relaxed">
+          Explora nuestro catálogo con decenas de opciones y agrega lo que más te antoje al carrito.
+        </p>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="relative text-center space-y-4 bg-[#FF5722] rounded-3xl p-8 shadow-sm
+                  shadow-orange-300 hover:shadow-md transition-shadow">
+        <div class="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center
+                    text-4xl mx-auto border-2 border-white/30">
+          📍
+        </div>
+        <span class="absolute top-5 right-5 font-display text-5xl text-white/20 select-none">02</span>
+        <h3 class="font-display text-xl text-white">Confirma tu pedido</h3>
+        <p class="text-white/80 text-sm leading-relaxed">
+          Ingresa tu dirección, elige cómo pagar y confirma. Todo en menos de un minuto.
+        </p>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="relative text-center space-y-4 bg-white rounded-3xl p-8 shadow-sm
+                  border border-orange-50 hover:shadow-md transition-shadow">
+        <div class="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center
+                    text-4xl mx-auto border-2 border-orange-100">
+          🛵
+        </div>
+        <span class="absolute top-5 right-5 font-display text-5xl text-orange-100 select-none">03</span>
+        <h3 class="font-display text-xl text-[#1A1A1B]">Disfruta en casa</h3>
+        <p class="text-[#5E5E5E] text-sm leading-relaxed">
+          Tu pedido llega caliente y a tiempo. Sin largas esperas, sin excusas.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 5: CTA FINAL
+════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-[#1A1A1B] py-24 px-6 md:px-12 lg:px-16">
+  <!-- Blob decorativo -->
+  <div class="absolute -top-20 -right-20 w-80 h-80 bg-[#FF5722]/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="relative z-10 max-w-3xl mx-auto text-center space-y-7">
+    <p class="text-[#FF8A65] font-bold text-sm uppercase tracking-widest">¿Listo para pedir?</p>
+    <h2 class="font-display text-4xl md:text-6xl text-white leading-tight">
+      El hambre<br>no espera.
+    </h2>
+    <p class="text-gray-400 text-lg max-w-md mx-auto">
+      Únete a miles de personas que ya piden con APIfood cada día.
+    </p>
+
+    <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+      <a href="{% url 'store_app:catalog' %}"
+         class="group relative inline-flex items-center gap-2 bg-[#FF5722] text-white
+                font-bold px-10 py-4 rounded-2xl text-base overflow-hidden
+                shadow-lg shadow-orange-900/40 hover:shadow-xl hover:shadow-orange-800/50
+                transition-all duration-300 hover:-translate-y-1">
+        <span class="relative z-10">Ver el menú ahora</span>
+        <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+        <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent
+                     -translate-x-full group-hover:translate-x-full transition-transform duration-500"></span>
+      </a>
+
+      {% if not user.is_authenticated %}
+      <a href="{% url 'users_app:user-register' %}"
+         class="inline-flex items-center gap-2 border-2 border-white/20 text-white font-bold
+                px-8 py-4 rounded-2xl text-base hover:bg-white/10 hover:border-white/40
+                transition-all duration-300">
+        Crear cuenta gratis
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Métodos de pago -->
+    <div class="flex items-center justify-center gap-3 text-gray-500 text-xs pt-4">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+      Pago seguro con
+      <span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-white">VISA</span>
+      <span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-white">MC</span>
+      <span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-white">PSE</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="bg-[#111111] py-10 px-6 md:px-12 lg:px-16">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <a href="{% url 'landing' %}" class="font-display text-2xl text-[#FF5722]">
+      API<span class="text-white">food</span>
+    </a>
+    <p class="text-gray-600 text-sm">© 2026 APIfood · Todos los derechos reservados.</p>
+    <div class="flex gap-6 text-gray-600 text-sm">
+      <a href="#" class="hover:text-gray-400 transition">Términos</a>
+      <a href="#" class="hover:text-gray-400 transition">Privacidad</a>
+      <a href="#" class="hover:text-gray-400 transition">Contacto</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Smooth scroll para el link "¿Cómo funciona?"
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
 {% endblock %}
