@@ -5,9 +5,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" /> <!-- Fuentes -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>  <!-- ✅ AGREGAR AQUÍ — Lucide Icons (la que mejor combina con Tailwind) -->   
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -43,9 +43,6 @@
             API<span class="text-carbon">food</span>
         </a>
 
-        
-        
-
         <div class="space-x-6 hidden md:flex font-medium text-ceniza">
             <a href="{% url 'store_app:catalog' %}" class="hover:text-rappi transition">Menú</a>
             <a href="#" class="hover:text-rappi transition">Promociones</a>
@@ -57,41 +54,52 @@
             {% if user.is_authenticated %}
             <a href="{% url 'cart_app:cart-detail' %}"
                class="relative p-2 rounded-xl hover:bg-humo transition mr-1">
-                <svg class="w-6 h-6 text-carbon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M3 3h2l.4 2M7 13h10l4-16H5.4M7 13L5.4 5M7 13l-1.5 8M17 13l1.5 8M9 21h6"/>
-                </svg>
+
+                <!-- ✅ ANTES: SVG manual de carrito → AHORA: Lucide shopping-cart -->
+                <i data-lucide="shopping-cart" class="w-6 h-6 text-carbon"></i>
+
                 <span id="nav-cart-badge"
                       class="absolute -top-1 -right-1 w-5 h-5 bg-rappi text-white
                              text-[10px] font-bold rounded-full hidden items-center justify-center">
                     0
                 </span>
             </a>
-        {% endif %}
+            {% endif %}
             
             <a href="{% url 'cart_app:cart-detail' %}" class="relative">
-                <svg class="w-6 h-6 text-carbon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
+
+                <!-- ✅ ANTES: SVG manual de bolsa → AHORA: Lucide shopping-bag -->
+                <i data-lucide="shopping-bag" class="w-6 h-6 text-carbon"></i>
+
                 <span class="absolute top-0 right-0 bg-rappi text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">0</span>
             </a>
+
             {% if user.is_authenticated %}
                 <span class="text-sm text-ceniza hidden sm:inline">{{ user.username }}</span>
                 <form method="post" action="{% url 'users_app:user-logout' %}">
                     {% csrf_token %}
                     <button type="submit"
-                            class="border-2 border-carbon/20 text-carbon px-4 py-1.5 rounded-full 
+                            class="flex items-center gap-1.5 border-2 border-carbon/20 text-carbon px-4 py-1.5 rounded-full 
                                    font-bold hover:bg-carbon/5 transition text-sm cursor-pointer bg-transparent">
+
+                        <!-- ✅ NUEVO: icono al botón de cerrar sesión -->
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
                         Cerrar sesión
                     </button>
                 </form>
             {% else %}
                 <a href="{% url 'users_app:user-login' %}"
-                    class="border-2 border-rappi text-rappi px-4 py-1.5 rounded-full font-bold hover:bg-rappi hover:text-white transition text-sm">
+                    class="flex items-center gap-1.5 border-2 border-rappi text-rappi px-4 py-1.5 rounded-full font-bold hover:bg-rappi hover:text-white transition text-sm">
+
+                    <!-- ✅ NUEVO: icono al botón de iniciar sesión -->
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
                     Iniciar sesión
                 </a>
                 <a href="{% url 'users_app:user-register' %}"
-                    class="bg-rappi text-white px-4 py-1.5 rounded-full font-bold hover:bg-rappiSoft transition text-sm">
+                    class="flex items-center gap-1.5 bg-rappi text-white px-4 py-1.5 rounded-full font-bold hover:bg-rappiSoft transition text-sm">
+
+                    <!-- ✅ NUEVO: icono al botón de registrarse -->
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
                     Registrarse
                 </a>
             {% endif %}
@@ -103,7 +111,9 @@
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 
-    
+    <!-- ✅ REQUERIDO: activa todos los iconos Lucide del DOM al final del body -->
+    <script>lucide.createIcons();</script>
+
 </body>
 
 </html>

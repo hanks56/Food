@@ -112,12 +112,12 @@
             <h2 class="text-2xl font-extrabold text-carbon mb-6 flex items-center gap-2">{{ category.emoji }} {{ category.name }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for product in category.products.all %}
-                <article class="product-card cursor-pointer bg-white rounded-2xl p-4 ...
-                data-id="{{ product.id }}"
-                data-name="{{ product.name }}"
-                data-description="{{ product.description }}"
-                data-price="{{ product.price }}"
-                data-image="{{ product.image_url|default:'' }}">
+                <article class="product-card group cursor-pointer bg-white rounded-2xl p-4 flex gap-4 items-center border border-gray-100 shadow-sm hover:shadow-md hover:border-rappi/30 transition-all duration-200"
+                         data-id="{{ product.id }}"
+                         data-name="{{ product.name }}"
+                         data-description="{{ product.description }}"
+                         data-price="{{ product.price }}"
+                         data-image="{{ product.image_url|default:'' }}">
                     <div class="flex-1 min-w-0">
                         {% if product.is_promo %}
                         <span class="text-xs font-bold text-rappi bg-rappi/10 px-2 py-0.5 rounded">Promo</span>

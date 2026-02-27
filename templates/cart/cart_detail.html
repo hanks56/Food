@@ -56,19 +56,17 @@
     {# ── Layout principal: items (izq) + resumen (der) ─────────────────────── #}
     <div class="max-w-6xl mx-auto px-4 md:px-8 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {# ════════════════════════════════════════════════════════
+        {% comment %}════════════════════════════════════════════════════════
            COLUMNA IZQUIERDA: Lista de ítems del carrito
-        ════════════════════════════════════════════════════════ #}
+        ════════════════════════════════════════════════════════{% endcomment %}
         <div class="lg:col-span-2 space-y-4" id="cart-items-container">
 
             {% if items %}
 
                 {% for item in items %}
-                {#
-                   Cada tarjeta de ítem tiene:
+                {% comment %}Cada tarjeta de ítem tiene:
                    - data-item-id: para identificarlo en las llamadas AJAX
-                   - data-price: precio unitario, para recalcular subtotal en JS
-                #}
+                   - data-price: precio unitario, para recalcular subtotal en JS{% endcomment %}
                 <div class="cart-item bg-white rounded-2xl p-4 border border-gray-100
                             shadow-sm hover:shadow-md transition-shadow duration-200
                             flex gap-4 items-start"
@@ -183,9 +181,9 @@
             {% endif %}
         </div>
 
-        {# ════════════════════════════════════════════════════════
+        {% comment %}════════════════════════════════════════════════════════
            COLUMNA DERECHA: Resumen del pedido (sticky)
-        ════════════════════════════════════════════════════════ #}
+        ════════════════════════════════════════════════════════{% endcomment %}
         <div class="lg:col-span-1">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm
                         lg:sticky lg:top-24 overflow-hidden"
@@ -308,13 +306,203 @@
 {% endblock %}
 
 
-{# ══════════════════════════════════════════════════════════════════════════
+{% comment %}══════════════════════════════════════════════════════════════════════════
    JavaScript del carrito
    - Todas las acciones son AJAX (fetch) para no recargar la página
    - Usamos el CSRF token de Django en cada POST
    - Las URLs vienen de los atributos data-* para no hardcodear rutas
-══════════════════════════════════════════════════════════════════════════ #}
+══════════════════════════════════════════════════════════════════════════{% endcomment %}
 
 {% block extra_js %}
-<script src="{% static 'js/cart.js' %}"></script>
+<script>
+(function () {
+    'use strict';
+
+    // ── Lee la cookie CSRF que Django inyecta — requerida en todo POST ────
+    function getCsrfToken() {
+        const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
+        return cookie ? decodeURIComponent(cookie.trim().split('=')[1]) : '';
+    }
+
+    // ── Toast de notificación visual ──────────────────────────────────────
+    function showToast(msg, isError = false) {
+        const toast    = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        const toastIcon = document.getElementById('toast-icon');
+        if (!toast) return;
+
+        toastMsg.textContent  = msg;
+        toastIcon.textContent = isError ? '✕' : '✓';
+        toast.classList.toggle('bg-red-600', isError);
+        toast.classList.toggle('bg-carbon',  !isError);
+
+        toast.style.transform = 'translateX(0)';
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => { toast.style.transform = 'translateX(120%)'; }, 2500);
+    }
+
+    // ── POST genérico con fetch ────────────────────────────────────────────
+    async function postJSON(url, body = {}) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+
+    // ── Actualiza totales en el resumen lateral ────────────────────────────
+    function updateSummary(total) {
+        const fmt = (n) => parseFloat(n).toLocaleString('es-CO');
+        const subtotalEl  = document.getElementById('summary-subtotal');
+        const totalEl     = document.getElementById('summary-total');
+        const deliveryEl  = document.getElementById('summary-delivery');
+        if (subtotalEl) subtotalEl.textContent = `$${fmt(total)}`;
+        if (totalEl)    totalEl.textContent    = `$${fmt(total)}`;
+        if (deliveryEl) {
+            deliveryEl.textContent = parseFloat(total) >= 25000 ? 'Gratis 🎉' : '$3.500';
+            deliveryEl.className   = parseFloat(total) >= 25000
+                ? 'text-green-600 font-medium'
+                : 'text-red-500 font-medium';
+        }
+    }
+
+    // ── Recalcula totales leyendo todos los ítems del DOM ─────────────────
+    function recalcTotal() {
+        let total = 0;
+        document.querySelectorAll('.cart-item').forEach(el => {
+            const price = parseFloat(el.dataset.price) || 0;
+            const qty   = parseInt(el.querySelector('.qty-display')?.textContent) || 0;
+            total += price * qty;
+        });
+        updateSummary(total);
+    }
+
+    // ── Muestra el estado vacío cuando no quedan ítems ────────────────────
+    function checkEmptyCart() {
+        const container = document.getElementById('cart-items-container');
+        if (!container) return;
+        const items = container.querySelectorAll('.cart-item');
+        if (items.length > 0) return;
+
+        container.innerHTML = `
+            <div class="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm">
+                <div class="text-7xl mb-4">🛒</div>
+                <h2 class="text-xl font-extrabold text-carbon mb-2">Tu carrito está vacío</h2>
+                <p class="text-ceniza text-sm mb-6">¡Agrega algo delicioso!</p>
+                <a href="/tienda/catalogo/"
+                   class="inline-block bg-rappi text-white font-bold px-8 py-3
+                          rounded-xl hover:bg-rappiSoft transition">
+                    Ver el menú
+                </a>
+            </div>`;
+
+        updateSummary(0);
+
+        // Ocultar botón "Vaciar carrito" si existe
+        const btnClear = document.getElementById('btn-clear-cart');
+        if (btnClear) btnClear.style.display = 'none';
+    }
+
+    // ── Eliminar un ítem del carrito ──────────────────────────────────────
+    async function removeItem(itemId) {
+        try {
+            const data = await postJSON(`/carrito/eliminar/${itemId}/`);
+            if (!data.success) throw new Error(data.error || 'Error del servidor');
+
+            const el = document.getElementById(`item-${itemId}`);
+            if (el) {
+                el.style.transition = 'opacity 0.2s, transform 0.2s';
+                el.style.opacity    = '0';
+                el.style.transform  = 'translateX(16px)';
+                setTimeout(() => { el.remove(); checkEmptyCart(); }, 220);
+            }
+            updateSummary(data.cart_total);
+            showToast('Producto eliminado');
+        } catch (e) {
+            console.error('removeItem error:', e);
+            showToast('Error al eliminar el producto', true);
+        }
+    }
+
+    // ── Vaciar todo el carrito ────────────────────────────────────────────
+    async function clearCart() {
+        if (!confirm('¿Vaciar todo el carrito?')) return;
+        try {
+            const data = await postJSON('/carrito/vaciar/');
+            if (!data.success) throw new Error(data.error || 'Error del servidor');
+
+            document.querySelectorAll('.cart-item').forEach(el => el.remove());
+            checkEmptyCart();
+            showToast('Carrito vaciado');
+        } catch (e) {
+            console.error('clearCart error:', e);
+            showToast('Error al vaciar el carrito', true);
+        }
+    }
+
+    // ── Actualizar cantidad de un ítem (solo frontend por ahora) ──────────
+    function updateQty(itemId, delta) {
+        const card  = document.getElementById(`item-${itemId}`);
+        if (!card) return;
+        const qtyEl = card.querySelector('.qty-display');
+        let qty     = parseInt(qtyEl.textContent) + delta;
+
+        if (qty < 1) {
+            // Si baja de 1, eliminar el ítem directamente
+            removeItem(itemId);
+            return;
+        }
+        if (qty > 99) qty = 99;
+
+        qtyEl.textContent = qty;
+
+        // Actualizar subtotal del ítem
+        const price    = parseFloat(card.dataset.price) || 0;
+        const subtotal = (price * qty).toLocaleString('es-CO');
+        const subEl    = card.querySelector('.item-subtotal');
+        if (subEl) subEl.textContent = `$${subtotal}`;
+
+        recalcTotal();
+    }
+
+    // ── Registrar todos los listeners al cargar el DOM ────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Botón "Vaciar carrito"
+        const btnClear = document.getElementById('btn-clear-cart');
+        if (btnClear) btnClear.addEventListener('click', clearCart);
+
+        // Delegación de eventos en el contenedor de ítems
+        const container = document.getElementById('cart-items-container');
+        if (!container) return;
+
+        container.addEventListener('click', (e) => {
+            // Eliminar ítem
+            const removeBtn = e.target.closest('.btn-remove-item');
+            if (removeBtn) {
+                removeItem(removeBtn.dataset.itemId);
+                return;
+            }
+            // Restar cantidad
+            const minusBtn = e.target.closest('.btn-qty-minus');
+            if (minusBtn) {
+                updateQty(minusBtn.dataset.itemId, -1);
+                return;
+            }
+            // Sumar cantidad
+            const plusBtn = e.target.closest('.btn-qty-plus');
+            if (plusBtn) {
+                updateQty(plusBtn.dataset.itemId, +1);
+                return;
+            }
+        });
+    });
+
+})();
+</script>
 {% endblock %}
