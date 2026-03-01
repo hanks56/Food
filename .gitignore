@@ -1,1 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Entorno virtual
+venv/
+env/
 .env
+EntornoVirtual
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Archivos de configuración sensibles
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# Mac / Windows
+.DS_Store
+Thumbs.db
