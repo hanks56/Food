@@ -400,10 +400,10 @@
 </style>
 
 {# Variable de autenticación para catalog.js — sin tocar lógica del backend #}
+
 <script>
     window.IS_AUTHENTICATED = {% if user.is_authenticated %}true{% else %}false{% endif %};
 </script>
-
 {% endblock %}
 
 {% block extra_js %}

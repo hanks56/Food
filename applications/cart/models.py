@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 
 
 class Cart(models.Model):
+
+    """Representa el carrito de compras activo de un cliente.
+       Mantiene una relación 1 a 1 con el usuario para que no pierda 
+       su sesión de compra al salir de la aplicación."""
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -24,6 +29,10 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
+    
+    """ Tabla intermedia que conecta un carrito con los productos de comida rápida.
+    Permite almacenar la cantidad específica de un ítem sin duplicar el producto """
+
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey('store.Product', on_delete=models.CASCADE, related_name='cart_items')
     quantity = models.PositiveIntegerField(default=1)

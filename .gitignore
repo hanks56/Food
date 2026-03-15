@@ -27,3 +27,5 @@ staticfiles/
 # Mac / Windows
 .DS_Store
 Thumbs.db
+
+cspell.json

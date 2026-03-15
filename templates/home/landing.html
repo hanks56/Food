@@ -1,221 +1,222 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block title %}APIfood — Delivery de Comida Rápida{% endblock %}
 
+{% block content %}
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
 
-  /* ── Variables de diseño ── */
   :root {
-    --rappi: #FF5722;
+    --rappi:      #FF5722;
     --rappi-soft: #FF8A65;
-    --carbon: #1A1A1B;
-    --cream: #FFF8F3;
-    --warm-gray: #F5F0EB;
+    --carbon:     #1A1A1B;
+    --cream:      #FFF8F3;
+    --warm:       #F5F0EB;
   }
 
-  /* ── Tipografía editorial ── */
   .font-display { font-family: 'Syne', sans-serif; }
-  .font-body    { font-family: 'DM Sans', sans-serif; }
+  body { font-family: 'DM Sans', sans-serif; }
 
-  /* ── Animaciones de entrada escalonada ── */
+  /* ── Animaciones de entrada ── */
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(32px); }
+    from { opacity: 0; transform: translateY(28px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  @keyframes slideRight {
-    from { opacity: 0; transform: translateX(-24px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
   @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.92); }
+    from { opacity: 0; transform: scale(0.94); }
     to   { opacity: 1; transform: scale(1); }
   }
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
   @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(-2deg); }
-    50%       { transform: translateY(-16px) rotate(1deg); }
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%       { transform: translateY(-14px) rotate(1deg); }
   }
   @keyframes floatBadge {
     0%, 100% { transform: translateY(0) rotate(3deg); }
-    50%       { transform: translateY(-10px) rotate(5deg); }
+    50%       { transform: translateY(-8px) rotate(5deg); }
   }
-  @keyframes marqueeScroll {
+  @keyframes marquee {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
-  @keyframes pulse-dot {
+  @keyframes pulseDot {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.5; transform: scale(0.8); }
+    50%       { opacity: 0.4; transform: scale(0.75); }
+  }
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
   }
 
-  .anim-fade-up   { animation: fadeUp    0.7s cubic-bezier(0.22,1,0.36,1) both; }
-  .anim-fade-in   { animation: fadeIn    0.7s ease both; }
-  .anim-scale-in  { animation: scaleIn   0.7s cubic-bezier(0.22,1,0.36,1) both; }
-  .anim-slide-r   { animation: slideRight 0.7s cubic-bezier(0.22,1,0.36,1) both; }
-  .d-100 { animation-delay: 0.10s; }
-  .d-200 { animation-delay: 0.20s; }
-  .d-300 { animation-delay: 0.30s; }
-  .d-400 { animation-delay: 0.40s; }
-  .d-500 { animation-delay: 0.55s; }
-  .d-600 { animation-delay: 0.70s; }
+  .anim-up    { animation: fadeUp    0.65s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-scale { animation: scaleIn   0.65s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-slide { animation: slideRight 0.65s cubic-bezier(0.22,1,0.36,1) both; }
+  .d1 { animation-delay: 0.08s; }
+  .d2 { animation-delay: 0.18s; }
+  .d3 { animation-delay: 0.28s; }
+  .d4 { animation-delay: 0.38s; }
+  .d5 { animation-delay: 0.50s; }
 
-  /* ── Imagen flotante del hero ── */
-  .hero-image { animation: float 5s ease-in-out infinite; }
-  .badge-float { animation: floatBadge 4s ease-in-out infinite; }
+  .hero-float  { animation: float       5s ease-in-out infinite; }
+  .badge-float { animation: floatBadge  4s ease-in-out infinite; }
+  .pulse-dot   { animation: pulseDot    1.5s ease-in-out infinite; }
+  .marquee     { animation: marquee    20s linear infinite; }
 
-  /* ── Gradiente de texto ── */
+  /* ── Texto en degradado ── */
   .text-gradient {
-    background: linear-gradient(135deg, var(--rappi) 0%, #FF9800 100%);
+    background: linear-gradient(130deg, #FF5722 0%, #FF9800 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* ── Ruido de fondo sutil (textura) ── */
-  .noise-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── Tarjetas de producto hover 3D ── */
-  .product-lift {
-    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
-                box-shadow 0.35s ease;
-  }
-  .product-lift:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 24px 48px -12px rgba(255,87,34,0.18);
-  }
-
-  /* ── Marquee ticker ── */
-  .marquee-track { animation: marqueeScroll 22s linear infinite; }
-
   /* ── Línea decorativa ── */
   .deco-line {
     height: 3px;
-    background: linear-gradient(90deg, var(--rappi), #FF9800, transparent);
+    background: linear-gradient(90deg, #FF5722, #FF9800, transparent);
     border-radius: 9999px;
   }
 
-  /* ── Separador ondulado ── */
-  .wave-divider { line-height: 0; }
-
-  /* ── Dot pulsante ── */
-  .pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
-
-  /* ── Sombra de imagen hero ── */
-  .hero-shadow {
-    filter: drop-shadow(0 40px 60px rgba(255,87,34,0.25));
+  /* ── Tarjetas de producto ── */
+  .product-lift {
+    transition: transform 0.32s cubic-bezier(0.22,1,0.36,1), box-shadow 0.32s ease;
+  }
+  .product-lift:hover {
+    transform: translateY(-7px) scale(1.015);
+    box-shadow: 0 20px 48px -10px rgba(255,87,34,0.20);
   }
 
-  /* ── Override del nav de base.html ── */
-  body { font-family: 'DM Sans', sans-serif; }
+  /* ── Shimmer en CTA ── */
+  .btn-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: none;
+  }
+  .btn-shimmer:hover::after {
+    animation: shimmer 0.55s ease forwards;
+  }
+
+  /* ── Cards de equipo ── */
+  .team-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px -8px rgba(0,0,0,0.12);
+  }
+
+  /* ── Cards de promo ── */
+  .promo-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .promo-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px -8px rgba(255,87,34,0.22);
+  }
+
+  html { scroll-behavior: smooth; }
 </style>
 
 <!-- ════════════════════════════════════════════
-     SECCIÓN 1: HERO
+     SECCIÓN 1 — HERO
 ════════════════════════════════════════════ -->
-<section class="relative overflow-hidden bg-[#FFF8F3] min-h-[92vh] flex items-center noise-bg">
+<section class="relative overflow-hidden bg-[#FFF8F3] min-h-[90vh] flex items-center">
 
-  <!-- Círculo decorativo de fondo (naranja difuso) -->
-  <div class="absolute top-[-10%] right-[-5%] w-[55vw] h-[55vw] max-w-[700px] max-h-[700px]
-              rounded-full bg-gradient-to-br from-orange-100 to-amber-50 opacity-70 blur-3xl pointer-events-none">
-  </div>
-  <!-- Punto decorativo pequeño -->
-  <div class="absolute bottom-[15%] left-[8%] w-6 h-6 rounded-full bg-rappi opacity-30 pulse-dot"></div>
-  <div class="absolute top-[20%] right-[38%] w-3 h-3 rounded-full bg-amber-400 opacity-40 pulse-dot" style="animation-delay:0.7s"></div>
+  <!-- Blobs decorativos de fondo -->
+  <div class="absolute top-[-8%] right-[-4%] w-[52vw] max-w-[660px] aspect-square
+              rounded-full bg-gradient-to-br from-orange-100 to-amber-50
+              opacity-70 blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-[10%] left-[5%] w-5 h-5 rounded-full
+              bg-rappi opacity-25 pulse-dot"></div>
+  <div class="absolute top-[22%] right-[36%] w-3 h-3 rounded-full
+              bg-amber-400 opacity-35 pulse-dot" style="animation-delay:.7s"></div>
 
   <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16
-              grid grid-cols-1 md:grid-cols-2 gap-12 items-center py-20 lg:py-0">
+              grid grid-cols-1 md:grid-cols-2 gap-12 items-center py-20">
 
-    <!-- Texto izquierdo -->
+    <!-- Texto -->
     <div class="space-y-6">
 
-      <!-- Chip "Nuevo" -->
-      <div class="anim-slide-r d-100 inline-flex items-center gap-2 bg-white border border-orange-100
-                  px-4 py-1.5 rounded-full shadow-sm text-sm font-semibold text-[#FF5722]">
-        <span class="w-2 h-2 bg-[#FF5722] rounded-full pulse-dot"></span>
+      <!-- Chip de estado -->
+      <div class="anim-slide d1 inline-flex items-center gap-2 bg-white border
+                  border-orange-100 px-4 py-1.5 rounded-full shadow-sm
+                  text-sm font-semibold text-rappi">
+        <span class="w-2 h-2 bg-rappi rounded-full pulse-dot"></span>
         Entregas en menos de 30 min
       </div>
 
-      <!-- Titular principal -->
-      <h1 class="anim-fade-up d-200 font-display text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-[#1A1A1B]">
+      <!-- Titular -->
+      <h1 class="anim-up d2 font-display text-5xl md:text-6xl lg:text-7xl
+                 leading-[1.05] text-carbon">
         La comida<br>
         que amas,<br>
         <span class="text-gradient">en tu puerta.</span>
       </h1>
 
       <!-- Subtítulo -->
-      <p class="anim-fade-up d-300 text-[#5E5E5E] text-lg md:text-xl max-w-md leading-relaxed font-body">
+      <p class="anim-up d3 text-ceniza text-lg md:text-xl max-w-md leading-relaxed">
         Pide los mejores restaurantes de la ciudad con un solo clic.
         Rápido, fresco y sin complicaciones.
       </p>
 
       <!-- CTAs -->
-      <div class="anim-fade-up d-400 flex flex-wrap items-center gap-4">
+      <div class="anim-up d4 flex flex-wrap items-center gap-4">
         <a href="{% url 'store_app:catalog' %}"
-           class="group relative inline-flex items-center gap-2 bg-[#FF5722] text-white
-                  font-bold px-8 py-4 rounded-2xl text-base overflow-hidden
+           class="btn-shimmer group inline-flex items-center gap-2 bg-rappi text-white
+                  font-bold px-8 py-4 rounded-2xl text-base
                   shadow-lg shadow-orange-200 hover:shadow-xl hover:shadow-orange-300
-                  transition-all duration-300 hover:-translate-y-1">
-          <span class="relative z-10">Ver el menú</span>
-          <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-          </svg>
-          <!-- Hover shimmer -->
-          <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent
-                       -translate-x-full group-hover:translate-x-full transition-transform duration-500"></span>
+                  hover:-translate-y-0.5 transition-all duration-300">
+          <i data-lucide="utensils" class="w-5 h-5"></i>
+          Ver el menú
+          <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
         </a>
 
         <a href="#como-funciona"
-           class="inline-flex items-center gap-2 text-[#1A1A1B] font-semibold px-5 py-4
-                  rounded-2xl hover:bg-white hover:shadow-md transition-all duration-300 text-base">
-          <svg class="w-5 h-5 text-[#FF5722]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
+           class="inline-flex items-center gap-2 text-carbon font-semibold
+                  px-5 py-4 rounded-2xl hover:bg-white hover:shadow-md
+                  transition-all duration-300 text-base">
+          <i data-lucide="play-circle" class="w-5 h-5 text-rappi"></i>
           ¿Cómo funciona?
         </a>
       </div>
 
       <!-- Social proof -->
-      <div class="anim-fade-up d-500 flex items-center gap-5 pt-2">
-        <!-- Avatares apilados -->
+      <div class="anim-up d5 flex items-center gap-5 pt-2">
         <div class="flex -space-x-3">
           <img class="w-10 h-10 rounded-full border-2 border-white object-cover"
-               src="https://i.pravatar.cc/40?img=12" alt="Usuario">
+               src="https://i.pravatar.cc/40?img=12" alt="">
           <img class="w-10 h-10 rounded-full border-2 border-white object-cover"
-               src="https://i.pravatar.cc/40?img=23" alt="Usuario">
+               src="https://i.pravatar.cc/40?img=23" alt="">
           <img class="w-10 h-10 rounded-full border-2 border-white object-cover"
-               src="https://i.pravatar.cc/40?img=47" alt="Usuario">
-          <div class="w-10 h-10 rounded-full border-2 border-white bg-[#FF5722] flex items-center
-                      justify-center text-white text-xs font-bold">+8k</div>
+               src="https://i.pravatar.cc/40?img=47" alt="">
+          <div class="w-10 h-10 rounded-full border-2 border-white bg-rappi
+                      flex items-center justify-center text-white text-xs font-bold">+8k</div>
         </div>
         <div>
-          <div class="flex items-center gap-1">
-            <span class="text-amber-400 text-sm">★★★★★</span>
-          </div>
-          <p class="text-xs text-[#5E5E5E] font-medium">+8.000 pedidos este mes</p>
+          <div class="flex items-center gap-1 text-amber-400 text-sm">★★★★★</div>
+          <p class="text-xs text-ceniza font-medium">+8.000 pedidos este mes</p>
         </div>
       </div>
     </div>
 
-    <!-- Imagen derecha + badges flotantes -->
-    <div class="anim-scale-in d-200 relative flex justify-center items-center">
-      <!-- Círculo de fondo decorativo -->
-      <div class="absolute w-[90%] h-[90%] rounded-full bg-gradient-to-br from-orange-100 to-amber-100"></div>
+    <!-- Imagen flotante + badges -->
+    <div class="anim-scale d2 relative flex justify-center items-center">
+      <div class="absolute w-[88%] aspect-square rounded-full
+                  bg-gradient-to-br from-orange-100 to-amber-100"></div>
 
-      <!-- Imagen principal -->
-      <div class="hero-image relative z-10 hero-shadow">
-        <div class="w-72 h-72 md:w-[400px] md:h-[400px] lg:w-[460px] lg:h-[460px]
+      <div class="hero-float relative z-10"
+           style="filter: drop-shadow(0 36px 56px rgba(255,87,34,0.22))">
+        <div class="w-72 h-72 md:w-96 md:h-96 lg:w-[430px] lg:h-[430px]
                     rounded-[40%] overflow-hidden border-4 border-white shadow-2xl">
           <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=85&w=900"
                alt="Hamburguesa premium"
@@ -223,21 +224,21 @@
         </div>
       </div>
 
-      <!-- Badge: Envío gratis -->
-      <div class="badge-float absolute top-[8%] right-[4%] z-20 bg-white rounded-2xl px-4 py-3
-                  shadow-xl border border-green-100 flex items-center gap-2">
-        <span class="text-2xl">🛵</span>
+      <!-- Badge envío -->
+      <div class="badge-float absolute top-[8%] right-[4%] z-20 bg-white rounded-2xl
+                  px-4 py-3 shadow-xl border border-green-100 flex items-center gap-2">
+        <i data-lucide="bike" class="w-6 h-6 text-green-600"></i>
         <div>
           <p class="text-xs font-bold text-green-700">Envío gratis</p>
-          <p class="text-[10px] text-[#5E5E5E]">En tu primer pedido</p>
+          <p class="text-[10px] text-ceniza">En tu primer pedido</p>
         </div>
       </div>
 
-      <!-- Badge: Tiempo -->
-      <div class="absolute bottom-[12%] left-[2%] z-20 bg-[#1A1A1B] text-white rounded-2xl px-4 py-3
-                  shadow-xl flex items-center gap-2"
+      <!-- Badge tiempo -->
+      <div class="absolute bottom-[12%] left-[2%] z-20 bg-carbon text-white
+                  rounded-2xl px-4 py-3 shadow-xl flex items-center gap-2"
            style="animation: floatBadge 5s 1s ease-in-out infinite;">
-        <span class="text-2xl">⚡</span>
+        <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
         <div>
           <p class="text-xs font-bold">~28 minutos</p>
           <p class="text-[10px] text-gray-400">Tiempo estimado</p>
@@ -247,118 +248,123 @@
   </div>
 
   <!-- Ola inferior -->
-  <div class="wave-divider absolute bottom-0 left-0 w-full overflow-hidden leading-none">
-    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,40 C360,0 1080,80 1440,30 L1440,60 L0,60 Z" fill="white"/>
+  <div class="absolute bottom-0 left-0 w-full leading-none">
+    <svg viewBox="0 0 1440 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,38 C360,0 1080,75 1440,28 L1440,55 L0,55 Z" fill="white"/>
     </svg>
   </div>
 </section>
 
 
 <!-- ════════════════════════════════════════════
-     MARQUEE TICKER: categorías
+     TICKER MARQUEE
 ════════════════════════════════════════════ -->
 <div class="bg-white border-y border-gray-100 overflow-hidden py-3.5">
-  <div class="marquee-track flex items-center gap-8 w-max">
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍕 Pizza</span>
+  <div class="marquee flex items-center gap-8 w-max">
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="pizza" class="w-4 h-4 text-rappi"></i> Pizza</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍔 Hamburguesas</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="beef" class="w-4 h-4 text-rappi"></i> Hamburguesas</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🌭 Perros Calientes</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="hot-dog" class="w-4 h-4 text-rappi"></i> Perros Calientes</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍗 Alitas</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="drumstick" class="w-4 h-4 text-rappi"></i> Alitas</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🎯 Combos</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="package" class="w-4 h-4 text-rappi"></i> Combos</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥤 Bebidas</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="cup-soda" class="w-4 h-4 text-rappi"></i> Bebidas</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍰 Postres</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="cake" class="w-4 h-4 text-rappi"></i> Postres</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥗 Saludables</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="salad" class="w-4 h-4 text-rappi"></i> Saludables</span>
     <span class="text-gray-200">·</span>
-    {# Repetición para el efecto de loop infinito del marquee #}
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍕 Pizza</span>
+    {# Repetición para loop infinito #}
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="pizza" class="w-4 h-4 text-rappi"></i> Pizza</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍔 Hamburguesas</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="beef" class="w-4 h-4 text-rappi"></i> Hamburguesas</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🌭 Perros Calientes</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="hot-dog" class="w-4 h-4 text-rappi"></i> Perros Calientes</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍗 Alitas</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="drumstick" class="w-4 h-4 text-rappi"></i> Alitas</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🎯 Combos</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="package" class="w-4 h-4 text-rappi"></i> Combos</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥤 Bebidas</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="cup-soda" class="w-4 h-4 text-rappi"></i> Bebidas</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🍰 Postres</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="cake" class="w-4 h-4 text-rappi"></i> Postres</span>
     <span class="text-gray-200">·</span>
-    <span class="text-sm font-semibold text-[#5E5E5E] whitespace-nowrap tracking-wide">🥗 Saludables</span>
+    <span class="flex items-center gap-2 text-sm font-semibold text-ceniza whitespace-nowrap"><i data-lucide="salad" class="w-4 h-4 text-rappi"></i> Saludables</span>
   </div>
 </div>
 
 
 <!-- ════════════════════════════════════════════
-     SECCIÓN 2: POPULARES
+     SECCIÓN 2 — POPULARES HOY
 ════════════════════════════════════════════ -->
 <section class="bg-white py-20 px-6 md:px-12 lg:px-16">
   <div class="max-w-7xl mx-auto">
 
-    <!-- Encabezado de sección -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
       <div>
-        <p class="text-[#FF5722] font-bold text-sm uppercase tracking-widest mb-2">⭐ Lo más pedido</p>
-        <h2 class="font-display text-4xl md:text-5xl text-[#1A1A1B] leading-tight">
+        <p class="text-rappi font-bold text-xs uppercase tracking-widest mb-2
+                  flex items-center gap-1.5">
+          <i data-lucide="flame" class="w-4 h-4"></i> Lo más pedido
+        </p>
+        <h2 class="font-display text-4xl md:text-5xl text-carbon leading-tight">
           Populares hoy
         </h2>
-        <div class="deco-line w-16 mt-3"></div>
+        <div class="deco-line w-14 mt-3"></div>
       </div>
       <a href="{% url 'store_app:catalog' %}"
-         class="group inline-flex items-center gap-2 text-[#FF5722] font-bold
-                hover:gap-3 transition-all duration-200 text-sm">
+         class="group inline-flex items-center gap-2 text-rappi font-bold
+                hover:gap-3 transition-all text-sm">
         Ver menú completo
-        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-        </svg>
+        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
       </a>
     </div>
 
-    <!-- Grid de productos populares -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
       <!-- Producto 1 -->
       <a href="{% url 'store_app:catalog' %}"
-         class="product-lift group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer block">
+         class="product-lift group bg-white rounded-3xl overflow-hidden
+                border border-gray-100 shadow-sm block">
         <div class="relative overflow-hidden aspect-[4/3] bg-[#F5F0EB]">
           <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=600"
                alt="Classic Burger"
                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          <span class="absolute top-4 left-4 bg-[#FF5722] text-white text-xs font-bold
-                       px-3 py-1 rounded-full">🔥 Top ventas</span>
+          <span class="absolute top-4 left-4 bg-rappi text-white text-xs font-bold
+                       px-3 py-1 rounded-full flex items-center gap-1">
+            <i data-lucide="trending-up" class="w-3 h-3"></i> Top ventas
+          </span>
         </div>
         <div class="p-5">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <h3 class="font-display text-xl text-[#1A1A1B]">Classic Burger</h3>
-              <p class="text-[#5E5E5E] text-sm mt-0.5">Carne, lechuga, tomate y salsa especial.</p>
+              <h3 class="font-display text-xl text-carbon">Classic Burger</h3>
+              <p class="text-ceniza text-sm mt-0.5">Carne, lechuga, tomate y salsa especial.</p>
             </div>
-            <span class="text-[#FF5722] font-bold text-xl whitespace-nowrap">$18.000</span>
+            <span class="text-rappi font-bold text-xl whitespace-nowrap">$18.000</span>
           </div>
-          <div class="flex items-center gap-1 mt-3">
-            <span class="text-amber-400 text-xs">★★★★★</span>
-            <span class="text-xs text-[#5E5E5E]">(412)</span>
+          <div class="flex items-center gap-1 mt-3 text-amber-400 text-xs">
+            ★★★★★ <span class="text-ceniza ml-1">(412)</span>
           </div>
         </div>
       </a>
 
-      <!-- Producto 2 (grande, destacado) -->
+      <!-- Producto 2 — destacado oscuro -->
       <a href="{% url 'store_app:catalog' %}"
-         class="product-lift group bg-[#1A1A1B] rounded-3xl overflow-hidden shadow-sm cursor-pointer block sm:col-span-2 lg:col-span-1">
+         class="product-lift group bg-carbon rounded-3xl overflow-hidden
+                shadow-sm block sm:col-span-2 lg:col-span-1">
         <div class="relative overflow-hidden aspect-[4/3] bg-gray-800">
           <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=600"
-               alt="Pizza Elite"
-               class="w-full h-full object-cover opacity-80 group-hover:opacity-95 group-hover:scale-105 transition-all duration-500">
-          <div class="absolute inset-0 bg-gradient-to-t from-[#1A1A1B]/80 to-transparent"></div>
-          <span class="absolute top-4 left-4 bg-amber-400 text-[#1A1A1B] text-xs font-bold
-                       px-3 py-1 rounded-full">⭐ Destacado</span>
+               alt="Pizza Margherita"
+               class="w-full h-full object-cover opacity-80
+                      group-hover:opacity-95 group-hover:scale-105 transition-all duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-carbon/80 to-transparent"></div>
+          <span class="absolute top-4 left-4 bg-amber-400 text-carbon text-xs font-bold
+                       px-3 py-1 rounded-full flex items-center gap-1">
+            <i data-lucide="star" class="w-3 h-3"></i> Destacado
+          </span>
         </div>
         <div class="p-5">
           <div class="flex items-start justify-between gap-2">
@@ -366,36 +372,37 @@
               <h3 class="font-display text-xl text-white">Pizza Margherita</h3>
               <p class="text-gray-400 text-sm mt-0.5">Salsa de tomate, mozzarella y albahaca fresca.</p>
             </div>
-            <span class="text-[#FF8A65] font-bold text-xl whitespace-nowrap">$22.000</span>
+            <span class="text-rappiSoft font-bold text-xl whitespace-nowrap">$22.000</span>
           </div>
-          <div class="flex items-center gap-1 mt-3">
-            <span class="text-amber-400 text-xs">★★★★★</span>
-            <span class="text-xs text-gray-400">(287)</span>
+          <div class="flex items-center gap-1 mt-3 text-amber-400 text-xs">
+            ★★★★★ <span class="text-gray-400 ml-1">(287)</span>
           </div>
         </div>
       </a>
 
       <!-- Producto 3 -->
       <a href="{% url 'store_app:catalog' %}"
-         class="product-lift group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer block">
+         class="product-lift group bg-white rounded-3xl overflow-hidden
+                border border-gray-100 shadow-sm block">
         <div class="relative overflow-hidden aspect-[4/3] bg-[#F5F0EB]">
           <img src="https://images.unsplash.com/photo-1567620832903-0fc676de3866?auto=format&fit=crop&q=80&w=600"
                alt="Alitas BBQ"
                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           <span class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold
-                       px-3 py-1 rounded-full">🎉 Promo</span>
+                       px-3 py-1 rounded-full flex items-center gap-1">
+            <i data-lucide="percent" class="w-3 h-3"></i> Promo
+          </span>
         </div>
         <div class="p-5">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <h3 class="font-display text-xl text-[#1A1A1B]">Alitas BBQ x8</h3>
-              <p class="text-[#5E5E5E] text-sm mt-0.5">8 piezas con salsa barbecue.</p>
+              <h3 class="font-display text-xl text-carbon">Alitas BBQ x8</h3>
+              <p class="text-ceniza text-sm mt-0.5">8 piezas con salsa barbecue.</p>
             </div>
-            <span class="text-[#FF5722] font-bold text-xl whitespace-nowrap">$18.000</span>
+            <span class="text-rappi font-bold text-xl whitespace-nowrap">$18.000</span>
           </div>
-          <div class="flex items-center gap-1 mt-3">
-            <span class="text-amber-400 text-xs">★★★★☆</span>
-            <span class="text-xs text-[#5E5E5E]">(198)</span>
+          <div class="flex items-center gap-1 mt-3 text-amber-400 text-xs">
+            ★★★★☆ <span class="text-ceniza ml-1">(198)</span>
           </div>
         </div>
       </a>
@@ -406,25 +413,40 @@
 
 
 <!-- ════════════════════════════════════════════
-     SECCIÓN 3: STATS
+     SECCIÓN 3 — STATS
 ════════════════════════════════════════════ -->
-<section class="bg-[#1A1A1B] py-16 px-6 md:px-12 lg:px-16">
+<section class="bg-carbon py-16 px-6 md:px-12 lg:px-16">
   <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
 
-    <div class="space-y-2">
+    <div class="space-y-3">
+      <div class="flex justify-center text-rappi">
+        <i data-lucide="shopping-bag" class="w-8 h-8"></i>
+      </div>
       <p class="font-display text-4xl md:text-5xl text-white">8k+</p>
       <p class="text-gray-400 text-sm font-medium">Pedidos al mes</p>
     </div>
-    <div class="space-y-2">
-      <p class="font-display text-4xl md:text-5xl text-[#FF8A65]">28<span class="text-2xl">min</span></p>
+
+    <div class="space-y-3">
+      <div class="flex justify-center text-rappiSoft">
+        <i data-lucide="timer" class="w-8 h-8"></i>
+      </div>
+      <p class="font-display text-4xl md:text-5xl text-rappiSoft">28<span class="text-2xl">min</span></p>
       <p class="text-gray-400 text-sm font-medium">Entrega promedio</p>
     </div>
-    <div class="space-y-2">
+
+    <div class="space-y-3">
+      <div class="flex justify-center text-white">
+        <i data-lucide="store" class="w-8 h-8"></i>
+      </div>
       <p class="font-display text-4xl md:text-5xl text-white">50+</p>
       <p class="text-gray-400 text-sm font-medium">Restaurantes</p>
     </div>
-    <div class="space-y-2">
-      <p class="font-display text-4xl md:text-5xl text-[#FF8A65]">4.8<span class="text-2xl">★</span></p>
+
+    <div class="space-y-3">
+      <div class="flex justify-center text-rappiSoft">
+        <i data-lucide="star" class="w-8 h-8"></i>
+      </div>
+      <p class="font-display text-4xl md:text-5xl text-rappiSoft">4.8<span class="text-2xl">★</span></p>
       <p class="text-gray-400 text-sm font-medium">Calificación promedio</p>
     </div>
 
@@ -433,43 +455,204 @@
 
 
 <!-- ════════════════════════════════════════════
-     SECCIÓN 4: CÓMO FUNCIONA
+     SECCIÓN 4 — PROMOCIONES  (id="promociones")
 ════════════════════════════════════════════ -->
-<section id="como-funciona" class="bg-[#FFF8F3] py-20 px-6 md:px-12 lg:px-16">
+<section id="promociones" class="bg-[#FFF8F3] py-20 px-6 md:px-12 lg:px-16 scroll-mt-20">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Encabezado -->
+    <div class="text-center mb-14">
+      <p class="text-rappi font-bold text-xs uppercase tracking-widest mb-2
+                flex items-center justify-center gap-1.5">
+        <i data-lucide="tag" class="w-4 h-4"></i> Ofertas especiales
+      </p>
+      <h2 class="font-display text-4xl md:text-5xl text-carbon">Promociones</h2>
+      <p class="text-ceniza mt-3 max-w-md mx-auto text-sm leading-relaxed">
+        Descuentos imperdibles todos los días. ¡Aprovéchalos antes de que se agoten!
+      </p>
+      <div class="deco-line w-14 mt-4 mx-auto"></div>
+    </div>
+
+    <!-- Grid de promos -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Promo 1 — Banner grande -->
+      <div class="promo-card md:col-span-2 relative overflow-hidden rounded-3xl
+                  bg-carbon shadow-sm cursor-pointer group">
+        <img src="https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?auto=format&fit=crop&q=80&w=900"
+             alt="Combo Familiar"
+             class="absolute inset-0 w-full h-full object-cover opacity-40
+                    group-hover:opacity-55 group-hover:scale-105 transition-all duration-500">
+        <div class="relative z-10 p-8 flex flex-col justify-between min-h-[280px]">
+          <div>
+            <span class="inline-flex items-center gap-1.5 bg-rappi text-white text-xs
+                         font-bold px-3 py-1.5 rounded-full mb-4">
+              <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+              OFERTA DEL DÍA
+            </span>
+            <h3 class="font-display text-3xl text-white leading-tight mb-2">
+              Combo Familiar
+            </h3>
+            <p class="text-gray-300 text-sm max-w-xs leading-relaxed">
+              2 hamburguesas + papas medianas + 2 bebidas. ¡El plan perfecto para compartir!
+            </p>
+          </div>
+          <div class="flex items-end justify-between mt-6">
+            <div>
+              <p class="text-gray-400 text-sm line-through">$45.000</p>
+              <p class="font-display text-4xl text-rappiSoft">$38.000</p>
+            </div>
+            <a href="{% url 'store_app:catalog' %}"
+               class="btn-shimmer inline-flex items-center gap-2 bg-rappi text-white
+                      font-bold px-6 py-3 rounded-2xl hover:bg-rappiSoft
+                      transition-colors text-sm shadow-lg shadow-rappi/30">
+              <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+              Pedir ahora
+            </a>
+          </div>
+        </div>
+        <!-- Badge de descuento -->
+        <div class="absolute top-6 right-6 w-16 h-16 bg-amber-400 rounded-full
+                    flex flex-col items-center justify-center shadow-lg z-20">
+          <span class="font-display text-xl text-carbon leading-none">15%</span>
+          <span class="text-[9px] font-bold text-carbon/70 uppercase tracking-wide">OFF</span>
+        </div>
+      </div>
+
+      <!-- Promos pequeñas -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Promo 2 -->
+        <div class="promo-card relative overflow-hidden rounded-3xl bg-white
+                    border border-orange-100 shadow-sm p-6 cursor-pointer group flex-1">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 bg-[#F5F0EB]">
+              <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=200"
+                   alt="2x1 Pizza" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1">
+              <span class="inline-flex items-center gap-1 bg-orange-50 text-rappi text-[10px]
+                           font-bold px-2 py-0.5 rounded-full mb-1.5">
+                <i data-lucide="gift" class="w-3 h-3"></i> 2 × 1
+              </span>
+              <h4 class="font-display text-lg text-carbon leading-tight">Pizza 2×1</h4>
+              <p class="text-ceniza text-xs mt-1 leading-relaxed">
+                Los martes compra una pizza y lleva la segunda gratis.
+              </p>
+              <p class="text-rappi font-bold mt-2 text-base">Desde $22.000</p>
+            </div>
+          </div>
+          <a href="{% url 'store_app:catalog' %}"
+             class="mt-4 flex items-center justify-center gap-1.5 w-full border
+                    border-rappi/30 text-rappi font-medium py-2.5 rounded-xl text-sm
+                    hover:bg-rappi hover:text-white transition-colors">
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            Ver oferta
+          </a>
+        </div>
+
+        <!-- Promo 3 -->
+        <div class="promo-card relative overflow-hidden rounded-3xl bg-carbon
+                    shadow-sm p-6 cursor-pointer group flex-1">
+          <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-rappi/20 flex items-center
+                        justify-center flex-shrink-0">
+              <i data-lucide="bike" class="w-7 h-7 text-rappiSoft"></i>
+            </div>
+            <div class="flex-1">
+              <span class="inline-flex items-center gap-1 bg-green-500/20 text-green-400
+                           text-[10px] font-bold px-2 py-0.5 rounded-full mb-1.5">
+                <i data-lucide="check-circle" class="w-3 h-3"></i> GRATIS
+              </span>
+              <h4 class="font-display text-lg text-white leading-tight">Envío Gratis</h4>
+              <p class="text-gray-400 text-xs mt-1 leading-relaxed">
+                En tu primer pedido y en todos los pedidos mayores a $25.000.
+              </p>
+              <p class="text-green-400 font-bold mt-2 text-sm flex items-center gap-1">
+                <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                Aplica siempre
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Chips de beneficios -->
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      {% for benefit in benefit_list|default:"" %}{% empty %}
+      <div class="flex items-center gap-2 bg-white border border-gray-100 px-4 py-2.5
+                  rounded-full text-sm text-ceniza font-medium shadow-sm">
+        <i data-lucide="clock" class="w-4 h-4 text-rappi"></i>
+        Entrega en 28 min promedio
+      </div>
+      <div class="flex items-center gap-2 bg-white border border-gray-100 px-4 py-2.5
+                  rounded-full text-sm text-ceniza font-medium shadow-sm">
+        <i data-lucide="shield-check" class="w-4 h-4 text-green-500"></i>
+        Pago 100% seguro
+      </div>
+      <div class="flex items-center gap-2 bg-white border border-gray-100 px-4 py-2.5
+                  rounded-full text-sm text-ceniza font-medium shadow-sm">
+        <i data-lucide="refresh-ccw" class="w-4 h-4 text-blue-500"></i>
+        Garantía de satisfacción
+      </div>
+      <div class="flex items-center gap-2 bg-white border border-gray-100 px-4 py-2.5
+                  rounded-full text-sm text-ceniza font-medium shadow-sm">
+        <i data-lucide="headphones" class="w-4 h-4 text-purple-500"></i>
+        Soporte 24/7
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 5 — CÓMO FUNCIONA
+════════════════════════════════════════════ -->
+<section id="como-funciona" class="bg-white py-20 px-6 md:px-12 lg:px-16 scroll-mt-20">
   <div class="max-w-7xl mx-auto">
 
     <div class="text-center mb-14">
-      <p class="text-[#FF5722] font-bold text-sm uppercase tracking-widest mb-2">Simple como 1, 2, 3</p>
-      <h2 class="font-display text-4xl md:text-5xl text-[#1A1A1B]">¿Cómo funciona?</h2>
+      <p class="text-rappi font-bold text-xs uppercase tracking-widest mb-2
+                flex items-center justify-center gap-1.5">
+        <i data-lucide="list-ordered" class="w-4 h-4"></i> Simple como 1, 2, 3
+      </p>
+      <h2 class="font-display text-4xl md:text-5xl text-carbon">¿Cómo funciona?</h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-      <!-- Línea conectora (solo desktop) -->
-      <div class="hidden md:block absolute top-12 left-[20%] right-[20%] h-px bg-gradient-to-r
-                  from-transparent via-orange-200 to-transparent"></div>
+      <!-- Línea conectora desktop -->
+      <div class="hidden md:block absolute top-12 left-[22%] right-[22%] h-px
+                  bg-gradient-to-r from-transparent via-orange-200 to-transparent"></div>
 
       <!-- Paso 1 -->
-      <div class="relative text-center space-y-4 bg-white rounded-3xl p-8 shadow-sm
-                  border border-orange-50 hover:shadow-md transition-shadow">
-        <div class="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center
-                    text-4xl mx-auto border-2 border-orange-100">
-          🍔
+      <div class="relative text-center space-y-4 bg-[#FAFAFA] rounded-3xl p-8
+                  border border-gray-100 hover:border-orange-100
+                  hover:shadow-md transition-all">
+        <div class="w-20 h-20 rounded-2xl bg-orange-50 border-2 border-orange-100
+                    flex items-center justify-center mx-auto">
+          <i data-lucide="search" class="w-9 h-9 text-rappi"></i>
         </div>
-        <span class="absolute top-5 right-5 font-display text-5xl text-orange-100 select-none">01</span>
-        <h3 class="font-display text-xl text-[#1A1A1B]">Elige tu comida</h3>
-        <p class="text-[#5E5E5E] text-sm leading-relaxed">
-          Explora nuestro catálogo con decenas de opciones y agrega lo que más te antoje al carrito.
+        <span class="absolute top-5 right-6 font-display text-5xl text-orange-100
+                     select-none">01</span>
+        <h3 class="font-display text-xl text-carbon">Elige tu comida</h3>
+        <p class="text-ceniza text-sm leading-relaxed">
+          Explora nuestro catálogo con decenas de opciones y agrega lo que más te antoje.
         </p>
       </div>
 
-      <!-- Paso 2 -->
-      <div class="relative text-center space-y-4 bg-[#FF5722] rounded-3xl p-8 shadow-sm
-                  shadow-orange-300 hover:shadow-md transition-shadow">
-        <div class="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center
-                    text-4xl mx-auto border-2 border-white/30">
-          📍
+      <!-- Paso 2 — destacado -->
+      <div class="relative text-center space-y-4 bg-rappi rounded-3xl p-8
+                  shadow-lg shadow-orange-300">
+        <div class="w-20 h-20 rounded-2xl bg-white/20 border-2 border-white/30
+                    flex items-center justify-center mx-auto">
+          <i data-lucide="map-pin" class="w-9 h-9 text-white"></i>
         </div>
-        <span class="absolute top-5 right-5 font-display text-5xl text-white/20 select-none">02</span>
+        <span class="absolute top-5 right-6 font-display text-5xl text-white/20
+                     select-none">02</span>
         <h3 class="font-display text-xl text-white">Confirma tu pedido</h3>
         <p class="text-white/80 text-sm leading-relaxed">
           Ingresa tu dirección, elige cómo pagar y confirma. Todo en menos de un minuto.
@@ -477,15 +660,17 @@
       </div>
 
       <!-- Paso 3 -->
-      <div class="relative text-center space-y-4 bg-white rounded-3xl p-8 shadow-sm
-                  border border-orange-50 hover:shadow-md transition-shadow">
-        <div class="w-20 h-20 rounded-2xl bg-orange-50 flex items-center justify-center
-                    text-4xl mx-auto border-2 border-orange-100">
-          🛵
+      <div class="relative text-center space-y-4 bg-[#FAFAFA] rounded-3xl p-8
+                  border border-gray-100 hover:border-orange-100
+                  hover:shadow-md transition-all">
+        <div class="w-20 h-20 rounded-2xl bg-orange-50 border-2 border-orange-100
+                    flex items-center justify-center mx-auto">
+          <i data-lucide="bike" class="w-9 h-9 text-rappi"></i>
         </div>
-        <span class="absolute top-5 right-5 font-display text-5xl text-orange-100 select-none">03</span>
-        <h3 class="font-display text-xl text-[#1A1A1B]">Disfruta en casa</h3>
-        <p class="text-[#5E5E5E] text-sm leading-relaxed">
+        <span class="absolute top-5 right-6 font-display text-5xl text-orange-100
+                     select-none">03</span>
+        <h3 class="font-display text-xl text-carbon">Disfruta en casa</h3>
+        <p class="text-ceniza text-sm leading-relaxed">
           Tu pedido llega caliente y a tiempo. Sin largas esperas, sin excusas.
         </p>
       </div>
@@ -495,41 +680,224 @@
 
 
 <!-- ════════════════════════════════════════════
-     SECCIÓN 5: CTA FINAL
+     SECCIÓN 6 — NOSOTROS  (id="nosotros")
 ════════════════════════════════════════════ -->
-<section class="relative overflow-hidden bg-[#1A1A1B] py-24 px-6 md:px-12 lg:px-16">
-  <!-- Blob decorativo -->
-  <div class="absolute -top-20 -right-20 w-80 h-80 bg-[#FF5722]/20 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+<section id="nosotros" class="bg-[#FFF8F3] py-20 px-6 md:px-12 lg:px-16 scroll-mt-20">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Encabezado -->
+    <div class="text-center mb-14">
+      <p class="text-rappi font-bold text-xs uppercase tracking-widest mb-2
+                flex items-center justify-center gap-1.5">
+        <i data-lucide="users" class="w-4 h-4"></i> Quiénes somos
+      </p>
+      <h2 class="font-display text-4xl md:text-5xl text-carbon">Nosotros</h2>
+      <p class="text-ceniza mt-3 max-w-lg mx-auto text-sm leading-relaxed">
+        Somos aprendices del SENA apasionados por la tecnología y la buena comida,
+        construyendo el futuro del delivery en Colombia.
+      </p>
+      <div class="deco-line w-14 mt-4 mx-auto"></div>
+    </div>
+
+    <!-- Historia + imagen -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
+
+      <!-- Texto de historia -->
+      <div class="space-y-6">
+        <h3 class="font-display text-3xl text-carbon">Nuestra historia</h3>
+        <p class="text-ceniza leading-relaxed">
+          APIfood nació en las aulas del SENA como un proyecto de formación en
+          desarrollo de software. Lo que comenzó como un ejercicio académico se
+          convirtió en una aplicación web real, funcional y bien diseñada que
+          demuestra el talento de los aprendices colombianos.
+        </p>
+        <p class="text-ceniza leading-relaxed">
+          Construimos cada línea de código con dedicación: desde el sistema de
+          autenticación hasta el carrito de compras en tiempo real. Aprendimos
+          Django, Python, JavaScript y diseño UI en el proceso.
+        </p>
+
+        <!-- Valores -->
+        <div class="grid grid-cols-2 gap-4 pt-2">
+          <div class="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-100">
+            <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="rocket" class="w-5 h-5 text-rappi"></i>
+            </div>
+            <div>
+              <p class="font-bold text-carbon text-sm">Innovación</p>
+              <p class="text-ceniza text-xs leading-relaxed mt-0.5">Siempre buscando mejorar</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-100">
+            <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="heart" class="w-5 h-5 text-rappi"></i>
+            </div>
+            <div>
+              <p class="font-bold text-carbon text-sm">Pasión</p>
+              <p class="text-ceniza text-xs leading-relaxed mt-0.5">Código con propósito</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-100">
+            <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="handshake" class="w-5 h-5 text-rappi"></i>
+            </div>
+            <div>
+              <p class="font-bold text-carbon text-sm">Trabajo en equipo</p>
+              <p class="text-ceniza text-xs leading-relaxed mt-0.5">Juntos llegamos más lejos</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-100">
+            <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="graduation-cap" class="w-5 h-5 text-rappi"></i>
+            </div>
+            <div>
+              <p class="font-bold text-carbon text-sm">Aprendizaje</p>
+              <p class="text-ceniza text-xs leading-relaxed mt-0.5">SENA con orgullo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Imagen + badge SENA -->
+      <div class="relative flex justify-center">
+        <div class="relative w-full max-w-md">
+          <div class="rounded-3xl overflow-hidden aspect-[4/3] shadow-2xl">
+            <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=700"
+                 alt="Equipo APIfood" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-carbon/60 to-transparent"></div>
+          </div>
+          <!-- Badge SENA -->
+          <div class="absolute -bottom-5 -left-5 bg-white rounded-2xl p-4 shadow-xl
+                      border border-gray-100 flex items-center gap-3">
+            <div class="w-10 h-10 bg-carbon rounded-xl flex items-center justify-center">
+              <i data-lucide="graduation-cap" class="w-5 h-5 text-rappiSoft"></i>
+            </div>
+            <div>
+              <p class="font-bold text-carbon text-sm leading-tight">Proyecto SENA</p>
+              <p class="text-ceniza text-xs">Colombia · 2026</p>
+            </div>
+          </div>
+          <!-- Badge tech -->
+          <div class="absolute -top-5 -right-5 bg-carbon rounded-2xl px-4 py-3
+                      shadow-xl flex items-center gap-2">
+            <i data-lucide="code-2" class="w-5 h-5 text-rappiSoft"></i>
+            <div>
+              <p class="text-white text-xs font-bold leading-tight">Full-Stack</p>
+              <p class="text-gray-400 text-[10px]">Django + JS</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipo -->
+    <div>
+      <h3 class="font-display text-3xl text-carbon text-center mb-10">El equipo</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+        <!-- Miembro 1 -->
+        <div class="team-card bg-white rounded-3xl p-6 text-center border
+                    border-gray-100 shadow-sm">
+          <div class="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-4 bg-[#F5F0EB]">
+            <img src="https://i.pravatar.cc/80?img=33" alt=""
+                 class="w-full h-full object-cover">
+          </div>
+          <h4 class="font-display text-base text-carbon">Aprendiz 1</h4>
+          <p class="text-ceniza text-xs mt-1">Backend · Django</p>
+          <div class="flex justify-center gap-2 mt-3">
+            <span class="bg-orange-50 text-rappi text-[10px] font-bold px-2 py-0.5 rounded-full">Python</span>
+            <span class="bg-orange-50 text-rappi text-[10px] font-bold px-2 py-0.5 rounded-full">SQL</span>
+          </div>
+        </div>
+
+        <!-- Miembro 2 -->
+        <div class="team-card bg-white rounded-3xl p-6 text-center border
+                    border-gray-100 shadow-sm">
+          <div class="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-4 bg-[#F5F0EB]">
+            <img src="https://i.pravatar.cc/80?img=47" alt=""
+                 class="w-full h-full object-cover">
+          </div>
+          <h4 class="font-display text-base text-carbon">Aprendiz 2</h4>
+          <p class="text-ceniza text-xs mt-1">Frontend · UI/UX</p>
+          <div class="flex justify-center gap-2 mt-3">
+            <span class="bg-orange-50 text-rappi text-[10px] font-bold px-2 py-0.5 rounded-full">Tailwind</span>
+            <span class="bg-orange-50 text-rappi text-[10px] font-bold px-2 py-0.5 rounded-full">JS</span>
+          </div>
+        </div>
+
+        <!-- Miembro 3 -->
+        <div class="team-card bg-white rounded-3xl p-6 text-center border
+                    border-gray-100 shadow-sm">
+          <div class="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-4 bg-[#F5F0EB]">
+            <img src="https://i.pravatar.cc/80?img=12" alt=""
+                 class="w-full h-full object-cover">
+          </div>
+          <h4 class="font-display text-base text-carbon">Aprendiz 3</h4>
+          <p class="text-ceniza text-xs mt-1">Full-Stack</p>
+          <div class="flex justify-center gap-2 mt-3">
+            <span class="bg-orange-50 text-rappi text-[10px] font-bold px-2 py-0.5 rounded-full">Django</span>
+            <span class="bg-orange-50 text-rappi text-[10px] font-bold px-2 py-0.5 rounded-full">CSS</span>
+          </div>
+        </div>
+
+        <!-- Miembro 4 -->
+        <div class="team-card bg-carbon rounded-3xl p-6 text-center shadow-sm">
+          <div class="w-20 h-20 rounded-2xl bg-rappi/20 flex items-center
+                      justify-center mx-auto mb-4">
+            <i data-lucide="graduation-cap" class="w-9 h-9 text-rappiSoft"></i>
+          </div>
+          <h4 class="font-display text-base text-white">Instructor</h4>
+          <p class="text-gray-400 text-xs mt-1">Guía y mentor</p>
+          <div class="flex justify-center mt-3">
+            <span class="bg-rappi/20 text-rappiSoft text-[10px] font-bold px-2 py-0.5 rounded-full">SENA</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 7 — CTA FINAL
+════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-carbon py-24 px-6 md:px-12 lg:px-16">
+  <div class="absolute -top-20 -right-20 w-80 h-80 bg-rappi/15
+              rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-500/10
+              rounded-full blur-3xl pointer-events-none"></div>
 
   <div class="relative z-10 max-w-3xl mx-auto text-center space-y-7">
-    <p class="text-[#FF8A65] font-bold text-sm uppercase tracking-widest">¿Listo para pedir?</p>
+    <p class="text-rappiSoft font-bold text-xs uppercase tracking-widest
+              flex items-center justify-center gap-1.5">
+      <i data-lucide="zap" class="w-4 h-4"></i> ¿Listo para pedir?
+    </p>
     <h2 class="font-display text-4xl md:text-6xl text-white leading-tight">
       El hambre<br>no espera.
     </h2>
-    <p class="text-gray-400 text-lg max-w-md mx-auto">
+    <p class="text-gray-400 text-base max-w-md mx-auto leading-relaxed">
       Únete a miles de personas que ya piden con APIfood cada día.
     </p>
 
     <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
       <a href="{% url 'store_app:catalog' %}"
-         class="group relative inline-flex items-center gap-2 bg-[#FF5722] text-white
-                font-bold px-10 py-4 rounded-2xl text-base overflow-hidden
-                shadow-lg shadow-orange-900/40 hover:shadow-xl hover:shadow-orange-800/50
-                transition-all duration-300 hover:-translate-y-1">
-        <span class="relative z-10">Ver el menú ahora</span>
-        <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-        </svg>
-        <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent
-                     -translate-x-full group-hover:translate-x-full transition-transform duration-500"></span>
+         class="btn-shimmer group inline-flex items-center gap-2 bg-rappi text-white
+                font-bold px-10 py-4 rounded-2xl text-base
+                shadow-lg shadow-rappi/30 hover:-translate-y-0.5
+                transition-all duration-300">
+        <i data-lucide="utensils" class="w-5 h-5"></i>
+        Ver el menú ahora
+        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
       </a>
 
       {% if not user.is_authenticated %}
       <a href="{% url 'users_app:user-register' %}"
-         class="inline-flex items-center gap-2 border-2 border-white/20 text-white font-bold
-                px-8 py-4 rounded-2xl text-base hover:bg-white/10 hover:border-white/40
-                transition-all duration-300">
+         class="inline-flex items-center gap-2 border-2 border-white/20 text-white
+                font-bold px-8 py-4 rounded-2xl text-base
+                hover:bg-white/10 hover:border-white/40 transition-all">
+        <i data-lucide="user-plus" class="w-5 h-5"></i>
         Crear cuenta gratis
       </a>
       {% endif %}
@@ -537,9 +905,7 @@
 
     <!-- Métodos de pago -->
     <div class="flex items-center justify-center gap-3 text-gray-500 text-xs pt-4">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-      </svg>
+      <i data-lucide="lock" class="w-4 h-4"></i>
       Pago seguro con
       <span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-white">VISA</span>
       <span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-white">MC</span>
@@ -548,25 +914,88 @@
   </div>
 </section>
 
+
 <!-- ════════════════════════════════════════════
      FOOTER
 ════════════════════════════════════════════ -->
 <footer class="bg-[#111111] py-10 px-6 md:px-12 lg:px-16">
-  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-    <a href="{% url 'landing' %}" class="font-display text-2xl text-[#FF5722]">
-      API<span class="text-white">food</span>
-    </a>
-    <p class="text-gray-600 text-sm">© 2026 APIfood · Todos los derechos reservados.</p>
-    <div class="flex gap-6 text-gray-600 text-sm">
-      <a href="#" class="hover:text-gray-400 transition">Términos</a>
-      <a href="#" class="hover:text-gray-400 transition">Privacidad</a>
-      <a href="#" class="hover:text-gray-400 transition">Contacto</a>
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-white/10">
+
+      <!-- Marca -->
+      <div>
+        <a href="{% url 'landing' %}" class="font-display text-2xl text-rappi">
+          API<span class="text-white">food</span>
+        </a>
+        <p class="text-gray-500 text-sm mt-2 leading-relaxed max-w-xs">
+          Delivery de comida rápida construido con ❤️ por aprendices del SENA.
+        </p>
+        <div class="flex items-center gap-1.5 mt-4 text-gray-600 text-xs">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          Colombia · 2026
+        </div>
+      </div>
+
+      <!-- Links rápidos -->
+      <div>
+        <p class="text-white font-bold text-sm mb-4">Navegación</p>
+        <div class="space-y-2.5">
+          <a href="{% url 'store_app:catalog' %}"
+             class="flex items-center gap-2 text-gray-500 hover:text-rappi transition text-sm">
+            <i data-lucide="utensils" class="w-3.5 h-3.5"></i> Menú
+          </a>
+          <a href="#promociones"
+             class="flex items-center gap-2 text-gray-500 hover:text-rappi transition text-sm">
+            <i data-lucide="tag" class="w-3.5 h-3.5"></i> Promociones
+          </a>
+          <a href="#nosotros"
+             class="flex items-center gap-2 text-gray-500 hover:text-rappi transition text-sm">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i> Nosotros
+          </a>
+          {% if not user.is_authenticated %}
+          <a href="{% url 'users_app:user-register' %}"
+             class="flex items-center gap-2 text-gray-500 hover:text-rappi transition text-sm">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Registrarse
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Contacto / info -->
+      <div>
+        <p class="text-white font-bold text-sm mb-4">Información</p>
+        <div class="space-y-2.5">
+          <div class="flex items-center gap-2 text-gray-500 text-sm">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-rappi"></i>
+            Lunes a Domingo · 10am – 10pm
+          </div>
+          <div class="flex items-center gap-2 text-gray-500 text-sm">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-rappi"></i>
+            Entrega en ~28 minutos
+          </div>
+          <div class="flex items-center gap-2 text-gray-500 text-sm">
+            <i data-lucide="headphones" class="w-3.5 h-3.5 text-rappi"></i>
+            Soporte 24/7
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6">
+      <p class="text-gray-600 text-xs">
+        © 2026 APIfood · Proyecto SENA · Todos los derechos reservados.
+      </p>
+      <div class="flex gap-5 text-gray-600 text-xs">
+        <a href="#" class="hover:text-gray-400 transition">Términos</a>
+        <a href="#" class="hover:text-gray-400 transition">Privacidad</a>
+        <a href="#" class="hover:text-gray-400 transition">Contacto</a>
+      </div>
     </div>
   </div>
 </footer>
 
 <script>
-  // Smooth scroll para el link "¿Cómo funciona?"
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', function(e) {
       const target = document.querySelector(this.getAttribute('href'));

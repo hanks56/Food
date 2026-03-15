@@ -5,7 +5,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <title>{% block title %}APIfood{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <!-- Lucide Icons — librería de íconos SVG ligera y moderna -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,14 +15,15 @@
             theme: {
                 extend: {
                     colors: {
-                        rappi: "#FF5722",
+                        rappi:     "#FF5722",
                         rappiSoft: "#FF8A65",
-                        carbon: "#1A1A1B",
-                        ceniza: "#5E5E5E",
-                        humo: "#F2F2F2",
+                        carbon:    "#1A1A1B",
+                        ceniza:    "#5E5E5E",
+                        humo:      "#F2F2F2",
                     },
                     fontFamily: {
-                        sans: ["Inter", "sans-serif"],
+                        sans:    ["DM Sans", "sans-serif"],
+                        display: ["Syne", "sans-serif"],
                     },
                     boxShadow: {
                         soft: "0 4px 20px rgba(0,0,0,0.08)",
@@ -30,90 +33,145 @@
         };
     </script>
     <style>
-        body {
-            font-family: "Inter", sans-serif;
+        body { font-family: "DM Sans", sans-serif; }
+
+        /* Línea activa del navbar al hacer hover */
+        .nav-link {
+            position: relative;
         }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #FF5722;
+            border-radius: 9999px;
+            transition: width 0.25s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        /* Animación del badge del carrito al actualizarse */
+        @keyframes badgePop {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+        .badge-pop { animation: badgePop 0.3s ease; }
     </style>
 </head>
 
 <body class="bg-white text-carbon">
-    <nav class="flex justify-between items-center px-8 py-4 bg-white sticky top-0 z-50 shadow-sm">
-        <a href="{% url 'landing' %}" 
-            class="text-2xl font-extrabold text-rappi tracking-tighter">
+
+    <!-- ══════════════════════════════════════════════════════════
+         NAVBAR PRINCIPAL
+         Lucide íconos: menu, shopping-cart, log-in, log-out,
+         user-plus, tag, users, store
+    ══════════════════════════════════════════════════════════ -->
+    <nav class="flex justify-between items-center px-6 md:px-8 py-4 bg-white
+                sticky top-0 z-50 shadow-sm border-b border-gray-50">
+
+        <!-- Logo -->
+        <a href="{% url 'landing' %}"
+           class="font-display text-2xl font-bold text-rappi tracking-tighter
+                  hover:opacity-80 transition-opacity">
             API<span class="text-carbon">food</span>
         </a>
 
-        <div class="space-x-6 hidden md:flex font-medium text-ceniza">
-            <a href="{% url 'store_app:catalog' %}" class="hover:text-rappi transition">Menú</a>
-            <a href="#" class="hover:text-rappi transition">Promociones</a>
-            <a href="#" class="hover:text-rappi transition">Nosotros</a>
+        <!-- Links de navegación (desktop) -->
+        <div class="hidden md:flex items-center gap-7 font-medium text-ceniza">
+
+            <a href="{% url 'store_app:catalog' %}"
+               class="nav-link flex items-center gap-1.5 hover:text-rappi transition-colors text-sm">
+                <i data-lucide="utensils" class="w-4 h-4"></i>
+                Menú
+            </a>
+
+            <a href="{% url 'landing' %}#promociones"
+               class="nav-link flex items-center gap-1.5 hover:text-rappi transition-colors text-sm">
+                <i data-lucide="tag" class="w-4 h-4"></i>
+                Promociones
+            </a>
+
+            <a href="{% url 'landing' %}#nosotros"
+               class="nav-link flex items-center gap-1.5 hover:text-rappi transition-colors text-sm">
+                <i data-lucide="users" class="w-4 h-4"></i>
+                Nosotros
+            </a>
+
         </div>
 
-        <!-- Login / Registro (sin sesión) | Cuenta / Cerrar sesión (con sesión) -->
+        <!-- Acciones del lado derecho -->
         <div class="flex items-center gap-2">
+
             {% if user.is_authenticated %}
-            <a href="{% url 'cart_app:cart-detail' %}"
-               class="relative p-2 rounded-xl hover:bg-humo transition mr-1">
 
-                <!-- ✅ ANTES: SVG manual de carrito → AHORA: Lucide shopping-cart -->
-                <i data-lucide="shopping-cart" class="w-6 h-6 text-carbon"></i>
+                {# ── CARRITO (solo un ícono, sin duplicado) ── #}
+                <a href="{% url 'cart_app:cart-detail' %}"
+                   class="relative p-2 rounded-xl hover:bg-humo transition-colors mr-1"
+                   title="Ver carrito">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 text-carbon"></i>
+                    <span id="nav-cart-badge"
+                          class="absolute -top-1 -right-1 w-5 h-5 bg-rappi text-white
+                                 text-[10px] font-bold rounded-full hidden items-center
+                                 justify-center shadow-sm">
+                        0
+                    </span>
+                </a>
 
-                <span id="nav-cart-badge"
-                      class="absolute -top-1 -right-1 w-5 h-5 bg-rappi text-white
-                             text-[10px] font-bold rounded-full hidden items-center justify-center">
-                    0
+                {# ── Info del usuario ── #}
+                <span class="text-xs text-ceniza hidden sm:flex items-center gap-1.5
+                             bg-humo px-3 py-1.5 rounded-full">
+                    <i data-lucide="circle-user-round" class="w-3.5 h-3.5 text-rappi"></i>
+                    {{ user.first_name|default:user.username }}
                 </span>
-            </a>
-            {% endif %}
-            
-            <a href="{% url 'cart_app:cart-detail' %}" class="relative">
 
-                <!-- ✅ ANTES: SVG manual de bolsa → AHORA: Lucide shopping-bag -->
-                <i data-lucide="shopping-bag" class="w-6 h-6 text-carbon"></i>
-
-                <span class="absolute top-0 right-0 bg-rappi text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">0</span>
-            </a>
-
-            {% if user.is_authenticated %}
-                <span class="text-sm text-ceniza hidden sm:inline">{{ user.username }}</span>
+                {# ── Cerrar sesión ── #}
                 <form method="post" action="{% url 'users_app:user-logout' %}">
                     {% csrf_token %}
                     <button type="submit"
-                            class="flex items-center gap-1.5 border-2 border-carbon/20 text-carbon px-4 py-1.5 rounded-full 
-                                   font-bold hover:bg-carbon/5 transition text-sm cursor-pointer bg-transparent">
-
-                        <!-- ✅ NUEVO: icono al botón de cerrar sesión -->
+                            class="flex items-center gap-1.5 border border-carbon/15
+                                   text-carbon px-3.5 py-1.5 rounded-full font-medium
+                                   hover:bg-carbon/5 transition text-sm cursor-pointer
+                                   bg-transparent">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
-                        Cerrar sesión
+                        <span class="hidden sm:inline">Salir</span>
                     </button>
                 </form>
+
             {% else %}
+
+                {# ── Iniciar sesión ── #}
                 <a href="{% url 'users_app:user-login' %}"
-                    class="flex items-center gap-1.5 border-2 border-rappi text-rappi px-4 py-1.5 rounded-full font-bold hover:bg-rappi hover:text-white transition text-sm">
-
-                    <!-- ✅ NUEVO: icono al botón de iniciar sesión -->
+                   class="flex items-center gap-1.5 border border-rappi text-rappi
+                          px-4 py-1.5 rounded-full font-medium hover:bg-rappi
+                          hover:text-white transition text-sm">
                     <i data-lucide="log-in" class="w-4 h-4"></i>
-                    Iniciar sesión
+                    <span class="hidden sm:inline">Iniciar sesión</span>
                 </a>
-                <a href="{% url 'users_app:user-register' %}"
-                    class="flex items-center gap-1.5 bg-rappi text-white px-4 py-1.5 rounded-full font-bold hover:bg-rappiSoft transition text-sm">
 
-                    <!-- ✅ NUEVO: icono al botón de registrarse -->
+                {# ── Registrarse ── #}
+                <a href="{% url 'users_app:user-register' %}"
+                   class="flex items-center gap-1.5 bg-rappi text-white px-4 py-1.5
+                          rounded-full font-medium hover:bg-rappiSoft transition text-sm
+                          shadow-sm shadow-rappi/20">
                     <i data-lucide="user-plus" class="w-4 h-4"></i>
-                    Registrarse
+                    <span class="hidden sm:inline">Registrarse</span>
                 </a>
+
             {% endif %}
+
         </div>
     </nav>
 
-    <main>{% block content %} {% endblock %}</main>
+    <main>{% block content %}{% endblock %}</main>
 
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 
-    <!-- ✅ REQUERIDO: activa todos los iconos Lucide del DOM al final del body -->
+    <!-- Activa todos los íconos Lucide del DOM — DEBE ir al final del body -->
     <script>lucide.createIcons();</script>
 
 </body>
-
 </html>
